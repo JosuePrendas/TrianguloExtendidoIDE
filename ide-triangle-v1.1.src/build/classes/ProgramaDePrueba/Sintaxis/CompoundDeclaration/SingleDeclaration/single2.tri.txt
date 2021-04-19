@@ -1,0 +1,10 @@
+! El objetivo de esta prueba es demostrar que se agregó single-Declaration ::=
+! “var” Identifier “:=” Expression.
+! El diseño de la prueba será un programa donde se siga la estructura de la regla de producción.
+! Se espera que no ocurra ningún error sintáctico, y que genere un VarDeclaration.
+
+let
+    var x := 10
+in
+    puteol()
+end

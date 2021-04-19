@@ -1,0 +1,6 @@
+! El objetivo de esta prueba es demostrar que el analizador léxico y el analizador sintáctico reconocen el token 'package'.
+! El diseño de la prueba será un programa que solo constará de la palabra reservada 'package'.
+! Se espera que ocurra un error sintáctico informando que se esperaba un identificador,
+! según la estructura de PackageDeclaration en el lenguaje.
+
+package

@@ -1,0 +1,14 @@
+! El objetivo de esta prueba es demostrar que se agregó compound-Declaration ::= “recursive” Proc-Funcs “end”,
+! Proc-Func ::= “proc” Identifier “(“ Formal-Parameter-Sequence “)” “~” Command “end” |
+! “func” Identifier “(“ Formal-Parameter-Sequence “)” “:”  Type-denoter “~”  Expression y Proc-Funcs ::= Proc-Func (“|” Proc-Func)+.
+! El diseño de la prueba será un programa que contiene un ProcFuncDeclaration de un ProcDeclaration.
+! Se espera que ocurra un error sintáctico indicando que falta agregar otro ProcDeclaration o otro FuncDeclaration,
+! de la forma de que se espera el token ‘|’.
+
+let
+    recursive
+        proc inc(var n: Integer) ~ n := n+1; n := 2 end
+    end
+in
+    n := n+2
+end

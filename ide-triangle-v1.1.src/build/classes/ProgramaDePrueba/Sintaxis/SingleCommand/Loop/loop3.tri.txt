@@ -1,0 +1,12 @@
+! El objetivo de esta prueba es demostrar que se agregó single-Command ::= “loop” “do” Command (“while” | “until”) Expression “end”
+! El diseño de la prueba será un programa donde se siga la estructura de la regla de producción en el caso de ‘until’, en la cual en
+! Command se anidara otro loop pero en el caso de ‘while’, para evidenciar que ambas se agregaron a la misma estructura de ‘loop’.
+! Se espera que no ocurra ningún error sintáctico, y que genere un LoopDoUntilCommand con un LoopDoWhileCommand dentro.
+
+loop do
+    loop do
+        puteol()
+    while 1=1
+    end
+until 1=2
+end

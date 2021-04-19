@@ -1,0 +1,10 @@
+! El objetivo de esta prueba es demostrar que se agregó single-Command ::=
+! “loop” “for” Identifier “from” Expression “to” Expression “do” Command “end”.
+! El diseño de la prueba será un programa donde se siga la estructura de la regla de producción, en la cual Command será un SequentialCommand.
+! Se espera que no ocurra ningún error sintáctico, y que genere un LoopCommandForDo con un IdentifierExpressionTree, un Expression y
+! un SequentialCommand dentro.
+
+loop for x from 1 to 5 do
+    puteol();
+    put('x')
+end

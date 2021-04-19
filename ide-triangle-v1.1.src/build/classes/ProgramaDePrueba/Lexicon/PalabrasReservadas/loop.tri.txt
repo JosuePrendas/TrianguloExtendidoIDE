@@ -1,0 +1,6 @@
+! El objetivo de esta prueba es demostrar que el analizador léxico y el analizador sintáctico reconocen el token 'loop'.
+! El diseño de la prueba será un programa que solo constará de la palabra reservada 'loop'.
+! Se espera que ocurra un error sintáctico informando que se esperaba los tokens ‘while’, ‘until’ o ‘for’,
+! que corresponden a posibles tokens que le siguen a un loop según su estructura en el lenguaje.
+
+loop

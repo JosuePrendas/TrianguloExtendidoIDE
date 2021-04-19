@@ -1,0 +1,9 @@
+! El objetivo de esta prueba es demostrar que se eliminó single-Command ::= “let” Declaration “in” single-Command
+! El diseño de la prueba será un programa donde se siga la estructura de la regla de producción.
+! Se espera que ocurra un error de sintaxis que indique que falta la palabra reservada ‘end’ al final del programa.
+
+let
+    var x: Integer
+in
+    x := 0;
+    x := x+1

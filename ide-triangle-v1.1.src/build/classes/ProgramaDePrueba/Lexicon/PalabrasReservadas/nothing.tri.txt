@@ -1,0 +1,5 @@
+! El objetivo de esta prueba es demostrar que el analizador léxico y el analizador sintáctico reconocen el token 'nothing'.
+! El diseño de la prueba será un programa que solo constará de la palabra reservada 'nothing'.
+! Se espera que no ocurra ningún error sintáctico, y que genere un EmptyCommand.
+
+nothing

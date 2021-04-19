@@ -1,0 +1,7 @@
+! El objetivo de esta prueba es demostrar que el analizador léxico y el analizador sintáctico reconocen el token 'elsif'
+! El diseño de la prueba será un programa que solo constará de la palabra reservada 'elsif'.
+! Se espera que ocurra un error sintáctico informando que la palabra reservada 'elsif' no puede comenzar un comando, 
+! esto significa que el analizador lo reconoce como una palabra reservada del lenguaje, en otro caso lo tomaría como un identificador, 
+! de forma que el error de sintaxis sería que se esperaba ‘(‘.
+
+elsif

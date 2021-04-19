@@ -50,7 +50,7 @@ public class IDECompiler {
         HtmlWriter htmlWriter = new HtmlWriter(sourceName);
         Scanner scanner = new Scanner(source,htmlWriter);
         report = new IDEReporter();
-        Parser parser = new Parser(scanner, report, htmlWriter);
+        Parser parser = new Parser(scanner, report, htmlWriter  );
         boolean success = false;
         
         rootAST = parser.parseProgram();

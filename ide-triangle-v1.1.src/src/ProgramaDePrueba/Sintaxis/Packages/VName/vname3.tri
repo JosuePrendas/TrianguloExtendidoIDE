@@ -1,0 +1,10 @@
+! El objetivo de esta prueba es demostrar que se agregaron Long-Identifier ::= [Identifier “$”] Identifier,
+! V-name ::= LongIdentifier (“.” Identifier | “[“ Expression “]”) * y Type-denoter ::= Long-Identifier.
+! El diseño de la prueba será un programa que contiene una declaración de variable de un package, pero sin el segundo Identifier.
+! Se espera que ocurra un error sintáctico referente a que se esperaba un Identifier en LongIdentifier.
+
+let
+    var x:math$
+in
+    nothing
+end

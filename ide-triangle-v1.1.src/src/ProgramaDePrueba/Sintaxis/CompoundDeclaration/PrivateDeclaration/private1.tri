@@ -1,0 +1,16 @@
+! El objetivo de esta prueba es demostrar que se agregó compound-Declaration ::=  “private” Declaration “in” Declaration “end”.
+! El diseño de la prueba será un programa que contiene un PrivateDeclaration con un ProcFuncDeclaration dentro.
+! Se espera que no ocurra ningún error sintáctico, y que genere un PrivateDeclaration con un ProcFuncDeclaration dentro.
+
+let
+    private
+        recursive
+            proc inc(var n: Integer) ~ n := n+1; n := 2 end |
+            func odd(x: Integer):Boolean ~ (x//2) \= 0
+        end
+    in
+        var x: Integer
+    end
+in
+   n := 1
+end

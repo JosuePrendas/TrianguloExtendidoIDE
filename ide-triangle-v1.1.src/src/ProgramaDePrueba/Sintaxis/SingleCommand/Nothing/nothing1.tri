@@ -1,0 +1,6 @@
+  
+! El objetivo de esta prueba es demostrar que se se agregó single-Command ::= “nothing”.
+! El diseño de la prueba será un programa que solo constará de la palabra reservada 'nothing'.
+! Se espera que no ocurra ningún error sintáctico, y que genere un EmptyCommand.
+
+nothing
