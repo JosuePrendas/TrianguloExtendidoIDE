@@ -15,6 +15,8 @@
 package Triangle.SyntacticAnalyzer;
 
 
+import Triangle.TreeWriterHTML.HtmlWriter;
+
 public final class Scanner {
 
   private SourceFile sourceFile;
@@ -23,6 +25,7 @@ public final class Scanner {
   private char currentChar;
   private StringBuffer currentSpelling;
   private boolean currentlyScanningToken;
+  private HtmlWriter writer;
 
   private boolean isLetter(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
@@ -44,9 +47,10 @@ public final class Scanner {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  public Scanner(SourceFile source) {
+  public Scanner(SourceFile source, HtmlWriter htmlWriter) {
     sourceFile = source;
     currentChar = sourceFile.getSource();
+    writer = htmlWriter;
     debug = false;
   }
 
@@ -67,19 +71,39 @@ public final class Scanner {
 
   private void scanSeparator() {
     switch (currentChar) {
-    case '!':
-      {
+      case '!':
+        writer.addToHtmlComment(String.valueOf(currentChar));
         takeIt();
-        while ((currentChar != SourceFile.EOL) && (currentChar != SourceFile.EOT))
+        while ((currentChar != SourceFile.EOL) && (currentChar != SourceFile.EOT)) {
+          writer.addToHtmlComment(String.valueOf(currentChar));
           takeIt();
-        if (currentChar == SourceFile.EOL)
+        }
+        writer.addHtmlComment();
+        if (currentChar == SourceFile.EOL) {
+          writer.addHtmlJumpLine();
           takeIt();
-      }
-      break;
-
-    case ' ': case '\n': case '\r': case '\t':
-      takeIt();
-      break;
+        }
+        break;
+      case SourceFile.EOT:
+        takeIt();
+        writer.addHtmlSpace(currentSpelling);
+        break;
+      case ' ':
+        takeIt();
+        writer.addHtmlSpace();
+        break;
+      case '\n':
+        takeIt();
+        writer.addHtmlJumpLine();
+        break;
+      case '\r':
+        takeIt();
+        writer.addHtmlSpace(currentSpelling);
+        break;
+      case '\t':
+        takeIt();
+        writer.addHtmlTab();
+        break;
     }
   }
 
@@ -102,6 +126,7 @@ public final class Scanner {
       takeIt();
       while (isLetter(currentChar) || isDigit(currentChar))
         takeIt();
+      writer.addHtmlIdentifier(currentSpelling,Token.isReservedWord(currentSpelling.toString()));
       return Token.IDENTIFIER;
 
     case '0':  case '1':  case '2':  case '3':  case '4':
@@ -109,6 +134,7 @@ public final class Scanner {
       takeIt();
       while (isDigit(currentChar))
         takeIt();
+      writer.addHtmlLiteral(currentSpelling);
       return Token.INTLITERAL;
 
     case '+':  case '-':  case '*': case '/':  case '=':
@@ -117,6 +143,7 @@ public final class Scanner {
       takeIt();
       while (isOperator(currentChar))
         takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.OPERATOR;
 
     case '\'':
@@ -124,56 +151,86 @@ public final class Scanner {
       takeIt(); // the quoted character
       if (currentChar == '\'') {
       	takeIt();
+        writer.addHtmlLiteral(currentSpelling);
         return Token.CHARLITERAL;
       } else
         return Token.ERROR;
+    case '|':
+      takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
+      return Token.OR;
+
+    case '$':
+      takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
+      return Token.DOLAR;
 
     case '.':
       takeIt();
-      return Token.DOT;
+      if(currentChar=='.'){
+        takeIt();
+        writer.addHtmlIdentifier(currentSpelling,false);
+        return Token.DOTDOT;
+      }
+      else{
+        writer.addHtmlIdentifier(currentSpelling,false);
+        return Token.DOT;
+      }
 
     case ':':
       takeIt();
       if (currentChar == '=') {
         takeIt();
+        writer.addHtmlIdentifier(currentSpelling,false);
         return Token.BECOMES;
-      } else
+      } else {
+        writer.addHtmlIdentifier(currentSpelling,false);
         return Token.COLON;
+      }
 
     case ';':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.SEMICOLON;
 
     case ',':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.COMMA;
 
     case '~':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.IS;
 
     case '(':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.LPAREN;
 
     case ')':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.RPAREN;
 
     case '[':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.LBRACKET;
 
     case ']':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.RBRACKET;
 
     case '{':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.LCURLY;
 
     case '}':
       takeIt();
+      writer.addHtmlIdentifier(currentSpelling,false);
       return Token.RCURLY;
 
     case SourceFile.EOT:
@@ -181,6 +238,7 @@ public final class Scanner {
 
     default:
       takeIt();
+      writer.reportError();
       return Token.ERROR;
     }
   }
@@ -189,22 +247,19 @@ public final class Scanner {
     Token tok;
     SourcePosition pos;
     int kind;
-
-    currentlyScanningToken = false;
+    currentSpelling = new StringBuffer("");
     while (currentChar == '!'
-           || currentChar == ' '
-           || currentChar == '\n'
-           || currentChar == '\r'
-           || currentChar == '\t')
+            || currentChar == ' '
+            || currentChar == '\n'
+            || currentChar == '\r'
+            || currentChar == '\t') {
       scanSeparator();
-
+    }
     currentlyScanningToken = true;
     currentSpelling = new StringBuffer("");
     pos = new SourcePosition();
     pos.start = sourceFile.getCurrentLine();
-
     kind = scanToken();
-
     pos.finish = sourceFile.getCurrentLine();
     tok = new Token(kind, currentSpelling.toString(), pos);
     if (debug)

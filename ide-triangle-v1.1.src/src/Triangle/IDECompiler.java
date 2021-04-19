@@ -13,6 +13,7 @@ import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.SyntacticAnalyzer.Parser;
 import Triangle.ContextualAnalyzer.Checker;
 import Triangle.CodeGenerator.Encoder;
+import Triangle.TreeWriterHTML.HtmlWriter;
 
 
 
@@ -46,9 +47,10 @@ public class IDECompiler {
         
         System.out.println("Syntactic Analysis ...");
         SourceFile source = new SourceFile(sourceName);
-        Scanner scanner = new Scanner(source);
+        HtmlWriter htmlWriter = new HtmlWriter(sourceName);
+        Scanner scanner = new Scanner(source,htmlWriter);
         report = new IDEReporter();
-        Parser parser = new Parser(scanner, report);
+        Parser parser = new Parser(scanner, report, htmlWriter);
         boolean success = false;
         
         rootAST = parser.parseProgram();

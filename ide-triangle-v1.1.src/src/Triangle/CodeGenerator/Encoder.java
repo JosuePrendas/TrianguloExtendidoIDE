@@ -21,74 +21,9 @@ import java.io.IOException;
 
 import TAM.Instruction;
 import TAM.Machine;
+import Triangle.AbstractSyntaxTrees.*;
 import Triangle.ErrorReporter;
 import Triangle.StdEnvironment;
-import Triangle.AbstractSyntaxTrees.AST;
-import Triangle.AbstractSyntaxTrees.AnyTypeDenoter;
-import Triangle.AbstractSyntaxTrees.ArrayExpression;
-import Triangle.AbstractSyntaxTrees.ArrayTypeDenoter;
-import Triangle.AbstractSyntaxTrees.AssignCommand;
-import Triangle.AbstractSyntaxTrees.BinaryExpression;
-import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
-import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
-import Triangle.AbstractSyntaxTrees.CallCommand;
-import Triangle.AbstractSyntaxTrees.CallExpression;
-import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
-import Triangle.AbstractSyntaxTrees.CharacterExpression;
-import Triangle.AbstractSyntaxTrees.CharacterLiteral;
-import Triangle.AbstractSyntaxTrees.ConstActualParameter;
-import Triangle.AbstractSyntaxTrees.ConstDeclaration;
-import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
-import Triangle.AbstractSyntaxTrees.Declaration;
-import Triangle.AbstractSyntaxTrees.DotVname;
-import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
-import Triangle.AbstractSyntaxTrees.EmptyCommand;
-import Triangle.AbstractSyntaxTrees.EmptyExpression;
-import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
-import Triangle.AbstractSyntaxTrees.FuncActualParameter;
-import Triangle.AbstractSyntaxTrees.FuncDeclaration;
-import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
-import Triangle.AbstractSyntaxTrees.Identifier;
-import Triangle.AbstractSyntaxTrees.IfCommand;
-import Triangle.AbstractSyntaxTrees.IfExpression;
-import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
-import Triangle.AbstractSyntaxTrees.IntegerExpression;
-import Triangle.AbstractSyntaxTrees.IntegerLiteral;
-import Triangle.AbstractSyntaxTrees.LetCommand;
-import Triangle.AbstractSyntaxTrees.LetExpression;
-import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
-import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
-import Triangle.AbstractSyntaxTrees.MultipleFieldTypeDenoter;
-import Triangle.AbstractSyntaxTrees.MultipleFormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.MultipleRecordAggregate;
-import Triangle.AbstractSyntaxTrees.Operator;
-import Triangle.AbstractSyntaxTrees.ProcActualParameter;
-import Triangle.AbstractSyntaxTrees.ProcDeclaration;
-import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
-import Triangle.AbstractSyntaxTrees.Program;
-import Triangle.AbstractSyntaxTrees.RecordExpression;
-import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
-import Triangle.AbstractSyntaxTrees.SequentialCommand;
-import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
-import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
-import Triangle.AbstractSyntaxTrees.SimpleVname;
-import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
-import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
-import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
-import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
-import Triangle.AbstractSyntaxTrees.SubscriptVname;
-import Triangle.AbstractSyntaxTrees.TypeDeclaration;
-import Triangle.AbstractSyntaxTrees.UnaryExpression;
-import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
-import Triangle.AbstractSyntaxTrees.VarActualParameter;
-import Triangle.AbstractSyntaxTrees.VarDeclaration;
-import Triangle.AbstractSyntaxTrees.VarFormalParameter;
-import Triangle.AbstractSyntaxTrees.Visitor;
-import Triangle.AbstractSyntaxTrees.Vname;
-import Triangle.AbstractSyntaxTrees.VnameExpression;
-import Triangle.AbstractSyntaxTrees.WhileCommand;
 
 public final class Encoder implements Visitor {
 
@@ -105,7 +40,7 @@ public final class Encoder implements Visitor {
   public Object visitCallCommand(CallCommand ast, Object o) {
     Frame frame = (Frame) o;
     Integer argsSize = (Integer) ast.APS.visit(this, frame);
-    ast.I.visit(this, new Frame(frame.level, argsSize));
+    ast.L.visit(this, new Frame(frame.level, argsSize));
     return null;
   }
 
@@ -126,6 +61,11 @@ public final class Encoder implements Visitor {
     patch(jumpifAddr, nextInstrAddr);
     ast.C2.visit(this, frame);
     patch(jumpAddr, nextInstrAddr);
+    return null;
+  }
+
+  @Override
+  public Object visitElsifCommand(ElsifCommand ast, Object o) {
     return null;
   }
 
@@ -158,6 +98,46 @@ public final class Encoder implements Visitor {
     return null;
   }
 
+  @Override
+  public Object visitUntilCommand(UntilCommand ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopWhileCommand(LoopWhileCommand loopWhileCommand, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopUntilCommand(LoopUntilCommand loopUntilCommand, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopCommandForWhile(LoopCommandForWhile loopCommandForWhile, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o) {
+    return null;
+  }
+
 
   // Expressions
   public Object visitArrayExpression(ArrayExpression ast, Object o) {
@@ -180,7 +160,7 @@ public final class Encoder implements Visitor {
     Frame frame = (Frame) o;
     Integer valSize = (Integer) ast.type.visit(this, null);
     Integer argsSize = (Integer) ast.APS.visit(this, frame);
-    ast.I.visit(this, new Frame(frame.level, argsSize));
+    ast.L.visit(this, new Frame(frame.level, argsSize));
     return valSize;
   }
 
@@ -250,6 +230,11 @@ public final class Encoder implements Visitor {
     Integer valSize = (Integer) ast.type.visit(this, null);
     encodeFetch(ast.V, frame, valSize.intValue());
     return valSize;
+  }
+
+  @Override
+  public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
+    return null;
   }
 
 
@@ -353,6 +338,26 @@ public final class Encoder implements Visitor {
     ast.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
     writeTableDetails(ast);
     return new Integer(extraSize);
+  }
+
+  @Override
+  public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
+    return null;
   }
 
 
@@ -552,8 +557,13 @@ public final class Encoder implements Visitor {
     return new Integer(0);
   }
 
-  public Object visitSimpleTypeDenoter(SimpleTypeDenoter ast,
-					   Object o) {
+  @Override
+  public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
+    return null;
+  }
+
+  public Object visitSimpleTypeDenoter(LongIdentifierTypeDenoter ast,
+                                       Object o) {
     return new Integer(0);
   }
 
@@ -665,6 +675,11 @@ public final class Encoder implements Visitor {
     return null;
   }
 
+  @Override
+  public Object visitLongIdentifier(LongIdentifier ast, Object o) {
+    return null;
+  }
+
 
   // Value-or-variable names
   public Object visitDotVname(DotVname ast, Object o) {
@@ -679,7 +694,8 @@ public final class Encoder implements Visitor {
   public Object visitSimpleVname(SimpleVname ast, Object o) {
     ast.offset = 0;
     ast.indexed = false;
-    return ast.I.decl.entity;
+    //return ast.I.decl.entity;
+    return null;
   }
 
   public Object visitSubscriptVname(SubscriptVname ast, Object o) {

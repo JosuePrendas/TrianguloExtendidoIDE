@@ -21,10 +21,18 @@ public interface Visitor {
   public abstract Object visitCallCommand(CallCommand ast, Object o);
   public abstract Object visitEmptyCommand(EmptyCommand ast, Object o);
   public abstract Object visitIfCommand(IfCommand ast, Object o);
+  public abstract Object visitElsifCommand(ElsifCommand ast, Object o);
   public abstract Object visitLetCommand(LetCommand ast, Object o);
   public abstract Object visitSequentialCommand(SequentialCommand ast, Object o);
   public abstract Object visitWhileCommand(WhileCommand ast, Object o);
-
+  public abstract Object visitUntilCommand(UntilCommand ast, Object o);
+  public abstract Object visitLoopWhileCommand(LoopWhileCommand ast, Object o);
+  public abstract Object visitLoopUntilCommand(LoopUntilCommand ast, Object o);
+  public abstract Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o);
+  public abstract Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o);
+  public abstract Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o);
+  public abstract Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o);
+  public abstract Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o);
 
   // Expressions
   public abstract Object visitArrayExpression(ArrayExpression ast, Object o);
@@ -38,6 +46,7 @@ public interface Visitor {
   public abstract Object visitRecordExpression(RecordExpression ast, Object o);
   public abstract Object visitUnaryExpression(UnaryExpression ast, Object o);
   public abstract Object visitVnameExpression(VnameExpression ast, Object o);
+  public abstract Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o);
 
   // Declarations
   public abstract Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object o);
@@ -48,6 +57,10 @@ public interface Visitor {
   public abstract Object visitTypeDeclaration(TypeDeclaration ast, Object o);
   public abstract Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast, Object o);
   public abstract Object visitVarDeclaration(VarDeclaration ast, Object o);
+  public abstract Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o);
+  public abstract Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o);
+  public abstract Object visitPackageDeclaration(PackageDeclaration ast, Object o);
+  public abstract Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o);
 
   // Array Aggregates
   public abstract Object visitMultipleArrayAggregate(MultipleArrayAggregate ast, Object o);
@@ -83,7 +96,7 @@ public interface Visitor {
   public abstract Object visitBoolTypeDenoter(BoolTypeDenoter ast, Object o);
   public abstract Object visitCharTypeDenoter(CharTypeDenoter ast, Object o);
   public abstract Object visitErrorTypeDenoter(ErrorTypeDenoter ast, Object o);
-  public abstract Object visitSimpleTypeDenoter(SimpleTypeDenoter ast, Object o);
+  public abstract Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o);
   public abstract Object visitIntTypeDenoter(IntTypeDenoter ast, Object o);
   public abstract Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o);
 
@@ -95,6 +108,7 @@ public interface Visitor {
   public abstract Object visitIdentifier(Identifier ast, Object o);
   public abstract Object visitIntegerLiteral(IntegerLiteral ast, Object o);
   public abstract Object visitOperator(Operator ast, Object o);
+  public abstract Object visitLongIdentifier(LongIdentifier ast,Object o);
 
   // Value-or-variable names
   public abstract Object visitDotVname(DotVname ast, Object o);

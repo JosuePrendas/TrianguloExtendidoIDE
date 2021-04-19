@@ -10,7 +10,7 @@
  * This software is provided free for educational use only. It may
  * not be used for commercial purposes without the prior written permission
  * of the authors.
- */
+
 
 package Triangle.AbstractSyntaxTrees;
 
@@ -24,7 +24,7 @@ public class SimpleTypeDenoter extends TypeDenoter {
   }
 
   public Object visit (Visitor v, Object o) {
-    return v.visitSimpleTypeDenoter(this, o);
+    //return v.visitSimpleTypeDenoter(this, o);
   }
 
   public boolean equals (Object obj) {
@@ -33,3 +33,4 @@ public class SimpleTypeDenoter extends TypeDenoter {
 
   public Identifier I;
 }
+ */

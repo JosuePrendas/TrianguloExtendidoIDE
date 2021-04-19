@@ -10,6 +10,8 @@
  * This software is provided free for educational use only. It may
  * not be used for commercial purposes without the prior written permission
  * of the authors.
+
+    modified
  */
 
 package Triangle.AbstractSyntaxTrees;
@@ -18,9 +20,10 @@ import Triangle.SyntacticAnalyzer.SourcePosition;
 
 public class IfCommand extends Command {
 
-  public IfCommand (Expression eAST, Command c1AST, Command c2AST,
+  public IfCommand (Expression eAST, Command c1AST, ElsifCommand eiAST, Command c2AST,
                     SourcePosition thePosition) {
     super (thePosition);
+    EI = eiAST;
     E = eAST;
     C1 = c1AST;
     C2 = c2AST;
@@ -32,4 +35,5 @@ public class IfCommand extends Command {
 
   public Expression E;
   public Command C1, C2;
+  public ElsifCommand EI;
 }

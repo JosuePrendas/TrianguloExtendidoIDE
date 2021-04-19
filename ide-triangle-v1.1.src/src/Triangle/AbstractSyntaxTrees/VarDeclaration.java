@@ -18,11 +18,16 @@ import Triangle.SyntacticAnalyzer.SourcePosition;
 
 public class VarDeclaration extends Declaration {
 
-  public VarDeclaration (Identifier iAST, TypeDenoter tAST,
-                         SourcePosition thePosition) {
+  public VarDeclaration (Identifier iAST, TypeDenoter tAST, SourcePosition thePosition) {
     super (thePosition);
     I = iAST;
     T = tAST;
+  }
+
+  public VarDeclaration (Identifier iAST, Expression eAST, SourcePosition thePosition) {
+    super (thePosition);
+    I = iAST;
+    E = eAST;
   }
 
   public Object visit(Visitor v, Object o) {
@@ -31,4 +36,5 @@ public class VarDeclaration extends Declaration {
 
   public Identifier I;
   public TypeDenoter T;
+  public Expression E;
 }

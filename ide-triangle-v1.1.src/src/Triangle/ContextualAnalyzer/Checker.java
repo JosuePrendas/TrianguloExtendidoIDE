@@ -14,77 +14,9 @@
 
 package Triangle.ContextualAnalyzer;
 
+import Triangle.AbstractSyntaxTrees.*;
 import Triangle.ErrorReporter;
 import Triangle.StdEnvironment;
-import Triangle.AbstractSyntaxTrees.AnyTypeDenoter;
-import Triangle.AbstractSyntaxTrees.ArrayExpression;
-import Triangle.AbstractSyntaxTrees.ArrayTypeDenoter;
-import Triangle.AbstractSyntaxTrees.AssignCommand;
-import Triangle.AbstractSyntaxTrees.BinaryExpression;
-import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
-import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
-import Triangle.AbstractSyntaxTrees.CallCommand;
-import Triangle.AbstractSyntaxTrees.CallExpression;
-import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
-import Triangle.AbstractSyntaxTrees.CharacterExpression;
-import Triangle.AbstractSyntaxTrees.CharacterLiteral;
-import Triangle.AbstractSyntaxTrees.ConstActualParameter;
-import Triangle.AbstractSyntaxTrees.ConstDeclaration;
-import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
-import Triangle.AbstractSyntaxTrees.Declaration;
-import Triangle.AbstractSyntaxTrees.DotVname;
-import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
-import Triangle.AbstractSyntaxTrees.EmptyCommand;
-import Triangle.AbstractSyntaxTrees.EmptyExpression;
-import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
-import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
-import Triangle.AbstractSyntaxTrees.FormalParameter;
-import Triangle.AbstractSyntaxTrees.FormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.FuncActualParameter;
-import Triangle.AbstractSyntaxTrees.FuncDeclaration;
-import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
-import Triangle.AbstractSyntaxTrees.Identifier;
-import Triangle.AbstractSyntaxTrees.IfCommand;
-import Triangle.AbstractSyntaxTrees.IfExpression;
-import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
-import Triangle.AbstractSyntaxTrees.IntegerExpression;
-import Triangle.AbstractSyntaxTrees.IntegerLiteral;
-import Triangle.AbstractSyntaxTrees.LetCommand;
-import Triangle.AbstractSyntaxTrees.LetExpression;
-import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
-import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
-import Triangle.AbstractSyntaxTrees.MultipleFieldTypeDenoter;
-import Triangle.AbstractSyntaxTrees.MultipleFormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.MultipleRecordAggregate;
-import Triangle.AbstractSyntaxTrees.Operator;
-import Triangle.AbstractSyntaxTrees.ProcActualParameter;
-import Triangle.AbstractSyntaxTrees.ProcDeclaration;
-import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
-import Triangle.AbstractSyntaxTrees.Program;
-import Triangle.AbstractSyntaxTrees.RecordExpression;
-import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
-import Triangle.AbstractSyntaxTrees.SequentialCommand;
-import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
-import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
-import Triangle.AbstractSyntaxTrees.SimpleVname;
-import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
-import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
-import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
-import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
-import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
-import Triangle.AbstractSyntaxTrees.SubscriptVname;
-import Triangle.AbstractSyntaxTrees.Terminal;
-import Triangle.AbstractSyntaxTrees.TypeDeclaration;
-import Triangle.AbstractSyntaxTrees.TypeDenoter;
-import Triangle.AbstractSyntaxTrees.UnaryExpression;
-import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
-import Triangle.AbstractSyntaxTrees.VarActualParameter;
-import Triangle.AbstractSyntaxTrees.VarDeclaration;
-import Triangle.AbstractSyntaxTrees.VarFormalParameter;
-import Triangle.AbstractSyntaxTrees.Visitor;
-import Triangle.AbstractSyntaxTrees.VnameExpression;
-import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.SyntacticAnalyzer.SourcePosition;
 
 public final class Checker implements Visitor {
@@ -106,16 +38,18 @@ public final class Checker implements Visitor {
 
   public Object visitCallCommand(CallCommand ast, Object o) {
 
-    Declaration binding = (Declaration) ast.I.visit(this, null);
-    if (binding == null)
-      reportUndeclared(ast.I);
+    Declaration binding = (Declaration) ast.L.visit(this, null);
+    if (binding == null) {
+      //reportUndeclared(ast.L);
+    }
     else if (binding instanceof ProcDeclaration) {
       ast.APS.visit(this, ((ProcDeclaration) binding).FPS);
     } else if (binding instanceof ProcFormalParameter) {
       ast.APS.visit(this, ((ProcFormalParameter) binding).FPS);
-    } else
-      reporter.reportError("\"%\" is not a procedure identifier",
-                           ast.I.spelling, ast.I.position);
+    } else {
+      //reporter.reportError("\"%\" is not a procedure identifier",
+      //                   ast.I.spelling, ast.I.position);
+    }
     return null;
   }
 
@@ -129,6 +63,11 @@ public final class Checker implements Visitor {
       reporter.reportError("Boolean expression expected here", "", ast.E.position);
     ast.C1.visit(this, null);
     ast.C2.visit(this, null);
+    return null;
+  }
+
+  @Override
+  public Object visitElsifCommand(ElsifCommand ast, Object o) {
     return null;
   }
 
@@ -151,6 +90,46 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E.position);
     ast.C.visit(this, null);
+    return null;
+  }
+
+  @Override
+  public Object visitUntilCommand(UntilCommand ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopWhileCommand(LoopWhileCommand loopWhileCommand, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopUntilCommand(LoopUntilCommand loopUntilCommand, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopCommandForWhile(LoopCommandForWhile loopCommandForWhile, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o) {
     return null;
   }
 
@@ -197,9 +176,9 @@ public final class Checker implements Visitor {
   }
 
   public Object visitCallExpression(CallExpression ast, Object o) {
-    Declaration binding = (Declaration) ast.I.visit(this, null);
+    Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      reportUndeclared(ast.I);
+      //reportUndeclared(ast.L);
       ast.type = StdEnvironment.errorType;
     } else if (binding instanceof FuncDeclaration) {
       ast.APS.visit(this, ((FuncDeclaration) binding).FPS);
@@ -207,9 +186,10 @@ public final class Checker implements Visitor {
     } else if (binding instanceof FuncFormalParameter) {
       ast.APS.visit(this, ((FuncFormalParameter) binding).FPS);
       ast.type = ((FuncFormalParameter) binding).T;
-    } else
-      reporter.reportError("\"%\" is not a function identifier",
-                           ast.I.spelling, ast.I.position);
+    } else {
+      //reporter.reportError("\"%\" is not a function identifier",
+      //                   ast.I.spelling, ast.I.position);
+    }
     return ast.type;
   }
 
@@ -278,6 +258,11 @@ public final class Checker implements Visitor {
   public Object visitVnameExpression(VnameExpression ast, Object o) {
     ast.type = (TypeDenoter) ast.V.visit(this, null);
     return ast.type;
+  }
+
+  @Override
+  public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
+    return null;
   }
 
   // Declarations
@@ -350,6 +335,26 @@ public final class Checker implements Visitor {
       reporter.reportError ("identifier \"%\" already declared",
                             ast.I.spelling, ast.position);
 
+    return null;
+  }
+
+  @Override
+  public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
+    return null;
+  }
+
+  @Override
+  public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
     return null;
   }
 
@@ -603,14 +608,14 @@ public final class Checker implements Visitor {
     return StdEnvironment.errorType;
   }
 
-  public Object visitSimpleTypeDenoter(SimpleTypeDenoter ast, Object o) {
-    Declaration binding = (Declaration) ast.I.visit(this, null);
+  public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
+    Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      reportUndeclared (ast.I);
+      //reportUndeclared (ast.L);
       return StdEnvironment.errorType;
     } else if (! (binding instanceof TypeDeclaration)) {
-      reporter.reportError ("\"%\" is not a type identifier",
-                            ast.I.spelling, ast.I.position);
+      //reporter.reportError ("\"%\" is not a type identifier",
+                            //ast.L.spelling, ast.L.position);
       return StdEnvironment.errorType;
     }
     return ((TypeDeclaration) binding).T;
@@ -659,6 +664,11 @@ public final class Checker implements Visitor {
     return binding;
   }
 
+  @Override
+  public Object visitLongIdentifier(LongIdentifier ast, Object o) {
+    return null;
+  }
+
   // Value-or-variable names
 
   // Determines the address of a named object (constant or variable).
@@ -699,8 +709,9 @@ public final class Checker implements Visitor {
     ast.variable = false;
     ast.type = StdEnvironment.errorType;
     Declaration binding = (Declaration) ast.I.visit(this, null);
-    if (binding == null)
-      reportUndeclared(ast.I);
+    if (binding == null) {
+      //reportUndeclared(ast.I);
+    }
     else
       if (binding instanceof ConstDeclaration) {
         ast.type = ((ConstDeclaration) binding).E.type;
@@ -714,9 +725,10 @@ public final class Checker implements Visitor {
       } else if (binding instanceof VarFormalParameter) {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
-      } else
-        reporter.reportError ("\"%\" is not a const or var identifier",
-                              ast.I.spelling, ast.I.position);
+      } else {
+        //reporter.reportError ("\"%\" is not a const or var identifier",
+        //ast.I.spelling, ast.I.position);
+      }
     return ast.type;
   }
 

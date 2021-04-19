@@ -68,42 +68,56 @@ final class Token extends Object {
 
     // reserved words - must be in alphabetical order...
     ARRAY		= 4,
-    BEGIN		= 5,
+    CHOOSE      = 5,
     CONST		= 6,
     DO			= 7,
     ELSE		= 8,
-    END			= 9,
-    FUNC		= 10,
-    IF			= 11,
-    IN			= 12,
-    LET			= 13,
-    OF			= 14,
-    PROC		= 15,
-    RECORD		= 16,
-    THEN		= 17,
-    TYPE		= 18,
-    VAR			= 19,
-    WHILE		= 20,
+    ELSIF       = 9,
+    END			= 10,
+    FOR         = 11,
+    FROM        = 12,
+    FUNC		= 13,
+    IF			= 14,
+    IN			= 15,
+    LET			= 16,
+    LOOP        = 17,
+    NOTHING     = 18,
+    OF			= 19,
+    PACKAGE     = 20,
+    PRIVATE     = 21,
+    PROC		= 22,
+    RECORD		= 23,
+    RECURSIVE   = 24,
+    THEN		= 25,
+    TO          = 26,
+    TYPE		= 27,
+    UNTIL       = 28,
+    VAR			= 29,
+    WHEN        = 30,
+    WHILE		= 31,
 
     // punctuation...
-    DOT			= 21,
-    COLON		= 22,
-    SEMICOLON	= 23,
-    COMMA		= 24,
-    BECOMES		= 25,
-    IS			= 26,
+    OR          = 32,
+    DOLAR       = 33,
+    DOTDOT      = 34,
+    DOT			= 35,
+    COLON		= 36,
+    SEMICOLON	= 37,
+    COMMA		= 38,
+    BECOMES		= 39,
+    IS			= 40,
 
     // brackets...
-    LPAREN		= 27,
-    RPAREN		= 28,
-    LBRACKET	= 29,
-    RBRACKET	= 30,
-    LCURLY		= 31,
-    RCURLY		= 32,
+    LPAREN		= 41,
+    RPAREN		= 42,
+    LBRACKET	= 43,
+    RBRACKET	= 44,
+    LCURLY		= 45,
+    RCURLY		= 46,
 
     // special tokens...
-    EOT			= 33,
-    ERROR		= 34;
+    EOT			= 47,
+    ERROR		= 48;
 
   private static String[] tokenTable = new String[] {
     "<int>",
@@ -111,22 +125,36 @@ final class Token extends Object {
     "<identifier>",
     "<operator>",
     "array",
-    "begin",
+    "choose",
     "const",
     "do",
     "else",
+    "elsif",
     "end",
+    "for",
+    "from",
     "func",
     "if",
     "in",
     "let",
+    "loop",
+    "nothing",
     "of",
+    "package",
+    "private",
     "proc",
     "record",
+    "recursive",
     "then",
+    "to",
     "type",
+    "until",
     "var",
+    "when",
     "while",
+    "|",
+    "$",
+    "..",
     ".",
     ":",
     ";",
@@ -145,5 +173,19 @@ final class Token extends Object {
 
   private final static int	firstReservedWord = Token.ARRAY,
   				lastReservedWord  = Token.WHILE;
+
+
+
+  //funcion para verificar que es una palabra reservada, retorna boolean
+  public static boolean isReservedWord(String token) {
+    boolean answer = false;
+    for(int i = 4;i<30;i++) { //asegurar que concuerde
+      if(tokenTable[i].equals(token)) {
+        answer = true;
+        break;
+      }
+    }
+    return answer;
+  }
 
 }

@@ -55,4 +55,8 @@ public class SourceFile {
   int getCurrentLine() {
     return currentLine;
   }
+
+  public String getName(){
+    return sourceFile.getName();
+  }
 }

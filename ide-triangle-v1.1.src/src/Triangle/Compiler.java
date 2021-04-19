@@ -21,6 +21,8 @@ import Triangle.SyntacticAnalyzer.Parser;
 import Triangle.SyntacticAnalyzer.Scanner;
 import Triangle.SyntacticAnalyzer.SourceFile;
 import Triangle.TreeDrawer.Drawer;
+import Triangle.TreeWriterHTML.HtmlWriter;
+import Triangle.TreeWriterHTML.Writer;
 
 /**
  * The main driver class for the Triangle compiler.
@@ -39,6 +41,7 @@ public class Compiler {
     private static Encoder encoder;
     private static ErrorReporter reporter;
     private static Drawer drawer;
+    private static HtmlWriter htmlWriter;
 
     /** The AST representing the source program. */
     private static Program theAST;
@@ -73,15 +76,20 @@ public class Compiler {
             System.exit(1);
         }
 
-        scanner  = new Scanner(source);
+        htmlWriter = new HtmlWriter(source.getName());
+        scanner  = new Scanner(source,htmlWriter);
         reporter = new ErrorReporter();
-        parser   = new Parser(scanner, reporter);
-        checker  = new Checker(reporter);
-        encoder  = new Encoder(reporter);
-        drawer   = new Drawer();
+        parser   = new Parser(scanner, reporter,htmlWriter);
+        //checker  = new Checker(reporter);
+        //encoder  = new Encoder(reporter);
+        //drawer   = new Drawer();
 
         // scanner.enableDebugging();
         theAST = parser.parseProgram();				// 1st pass
+        Writer writer = new Writer(source.getName());
+        if(theAST!=null)
+            writer.write(theAST);
+        /*
         if (reporter.numErrors == 0) {
             //if (showingAST) {
             //    drawer.draw(theAST);
@@ -96,16 +104,17 @@ public class Compiler {
                 encoder.encodeRun(theAST, showingTable);	// 3rd pass
             }
         }
+        */
 
-	boolean successful = (reporter.numErrors == 0);
-        if (successful) {
-            encoder.saveObjectProgram(objectName);
-            System.out.println("Compilation was successful.");
-        } else {
-            System.out.println("Compilation was unsuccessful.");
+        boolean successful = (reporter.numErrors == 0);
+            if (successful) {
+                //encoder.saveObjectProgram(objectName);
+                System.out.println("Compilation was successful.");
+            } else {
+                System.out.println("Compilation was unsuccessful.");
+            }
+            return successful;
         }
-        return successful;
-    }
 
     /**
      * Triangle compiler main program.
@@ -115,13 +124,14 @@ public class Compiler {
      */
     public static void main(String[] args) {
         boolean compiledOK;
-
+        /*
         if (args.length != 1) {
             System.out.println("Usage: tc filename");
             System.exit(1);
         }
-
         String sourceName = args[0];
+        */
+        String sourceName = "D:\\Importante\\TEC\\VII SEMESTRE\\COMPILADORES E INTERPRETES\\Proyecto-Compiladores\\ProgramasDePrueba\\sintaxis\\compoundDeclaration\\recursiveDeclaration\\recursive4.tri";
         compiledOK = compileProgram(sourceName, objectName, false, false);
     }
 }
