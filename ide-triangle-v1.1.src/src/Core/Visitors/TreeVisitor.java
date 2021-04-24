@@ -20,6 +20,7 @@ import Triangle.AbstractSyntaxTrees.CharacterLiteral;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
+import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.ElsifCommand;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
@@ -94,6 +95,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @author Luis Leopoldo Pérez <luiperpe@ns.isi.ulatina.ac.cr>
  */
+
+
 public class TreeVisitor implements Visitor {
       
     /**
@@ -413,10 +416,9 @@ public class TreeVisitor implements Visitor {
         DefaultMutableTreeNode t = new DefaultMutableTreeNode(caption);
         t.add((DefaultMutableTreeNode)child1.visit(this, null));
         t.add((DefaultMutableTreeNode)child2.visit(this, null));
-        
+       
         return(t);
     }
-    
     /**
      * Creates a ternary tree node.
      * @param caption The tree's caption (text to be shown when the tree is drawn).
@@ -461,47 +463,47 @@ public class TreeVisitor implements Visitor {
 
     @Override
     public Object visitUntilCommand(UntilCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createBinary("Until Command", ast.E, ast.C));
     }
 
     @Override
     public Object visitLoopWhileCommand(LoopWhileCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createUnary("Loop While Command ", ast.W));
     }
 
     @Override
     public Object visitLoopUntilCommand(LoopUntilCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createUnary("Loop For Do", ast.U));
     }
 
     @Override
     public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createBinary("Loop Do Until Command ", ast.C1, ast.E));
     }
 
     @Override
     public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createBinary("Loop Do While", ast.C1,ast.E));
     }
 
     @Override
     public Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createTernary("Loop For Do", ast.IE, ast.E1, ast.W));
     }
 
     @Override
     public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createTernary("Loop For Until", ast.IE, ast.E1, ast.U));
     }
 
     @Override
-    public Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object visitLoopCommandForDo(LoopCommandForDo ast, Object o) {
+        return (createTernary("Loop For Do", ast.IE, ast.E1, ast.C1));
     }
 
     @Override
     public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createBinary("Identifier Expresion",ast.I,ast.E));
     }
 
     @Override
@@ -511,7 +513,8 @@ public class TreeVisitor implements Visitor {
 
     @Override
     public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createNullary("Declaration"));
+        // return (createBinaryDeclaration("Private Declaration ", (Declaration)privateDeclaration.PFD1, (Declaration)privateDeclaration.PFD2));
     }
 
     @Override
@@ -523,14 +526,13 @@ public class TreeVisitor implements Visitor {
     public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
     @Override
     public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return(createNullary("Long Identifier" ));
+    }
+    
+    public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
+        return(createUnary("LongIdentifier Type Denoter", ast.L));
     }
 }
