@@ -14,7 +14,7 @@ import Triangle.SyntacticAnalyzer.Parser;
 import Triangle.ContextualAnalyzer.Checker;
 import Triangle.CodeGenerator.Encoder;
 import Triangle.TreeWriterHTML.HtmlWriter;
-
+import Triangle.TreeWriterHTML.Writer;
 
 
 /** 
@@ -47,6 +47,7 @@ public class IDECompiler {
         
         System.out.println("Syntactic Analysis ...");
         SourceFile source = new SourceFile(sourceName);
+        Writer writer = new Writer(sourceName);
         HtmlWriter htmlWriter = new HtmlWriter(sourceName);
         Scanner scanner = new Scanner(source,htmlWriter);
         report = new IDEReporter();
@@ -72,8 +73,14 @@ public class IDECompiler {
 
         if (success)
             System.out.println("Compilation was successful.");
+            if (rootAST != null)
+                writer.write(rootAST);
         else
             System.out.println("Compilation was unsuccessful.");
+        
+        
+        System.out.println("");
+        
         
         return(success);
     }
