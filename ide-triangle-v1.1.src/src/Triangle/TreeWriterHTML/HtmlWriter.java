@@ -2,7 +2,7 @@ package Triangle.TreeWriterHTML;
 
 import java.io.FileWriter;
 import java.io.IOException;
-
+//Nueva clase agregada
 public class HtmlWriter {
     private String fileName;
     private String htmlBuffer;

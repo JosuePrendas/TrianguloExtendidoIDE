@@ -155,12 +155,12 @@ public final class Scanner {
         return Token.CHARLITERAL;
       } else
         return Token.ERROR;
-    case '|':
+    case '|':  //Nuevo case agregado
       takeIt();
       writer.addHtmlIdentifier(currentSpelling,false);
       return Token.OR;
 
-    case '$':
+    case '$':    //Nuevo case agregado
       takeIt();
       writer.addHtmlIdentifier(currentSpelling,false);
       return Token.DOLAR;

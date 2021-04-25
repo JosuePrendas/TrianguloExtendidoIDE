@@ -68,41 +68,41 @@ final class Token extends Object {
 
     // reserved words - must be in alphabetical order...
     ARRAY		= 4,
-    CHOOSE      = 5,
+    CHOOSE      = 5, ///Nuevo token agregado
     CONST		= 6,
     DO			= 7,
     ELSE		= 8,
-    ELSIF       = 9,
+    ELSIF       = 9,///Nuevo token agregado
     END			= 10,
-    FOR         = 11,
-    FROM        = 12,
+    FOR         = 11,///Nuevo token agregado
+    FROM        = 12,///Nuevo token agregado
     FUNC		= 13,
     IF			= 14,
     IN			= 15,
     LET			= 16,
-    LOOP        = 17,
-    NOTHING     = 18,
+    LOOP        = 17,///Nuevo token agregado
+    NOTHING     = 18,///Nuevo token agregado
     OF			= 19,
-    PACKAGE     = 20,
-    PRIVATE     = 21,
+    PACKAGE     = 20,///Nuevo token agregado
+    PRIVATE     = 21,///Nuevo token agregado
     PROC		= 22,
     RECORD		= 23,
-    RECURSIVE   = 24,
+    RECURSIVE   = 24,///Nuevo token agregado
     THEN		= 25,
-    TO          = 26,
+    TO          = 26,///Nuevo token agregado
     TYPE		= 27,
-    UNTIL       = 28,
+    UNTIL       = 28,///Nuevo token agregado
     VAR			= 29,
-    WHEN        = 30,
+    WHEN        = 30,///Nuevo token agregado
     WHILE		= 31,
 
     // punctuation...
-    OR          = 32,
-    DOLAR       = 33,
-    DOTDOT      = 34,
+    OR          = 32,///Nuevo token agregado
+    DOLAR       = 33,///Nuevo token agregado
+    DOTDOT      = 34,///Nuevo token agregado
     DOT			= 35,
     COLON		= 36,
-    SEMICOLON	= 37,
+    SEMICOLON	= 37,///Nuevo token agregado
     COMMA		= 38,
     BECOMES		= 39,
     IS			= 40,
@@ -110,8 +110,8 @@ final class Token extends Object {
     // brackets...
     LPAREN		= 41,
     RPAREN		= 42,
-    LBRACKET	= 43,
-    RBRACKET	= 44,
+    LBRACKET	= 43,///Nuevo token agregado
+    RBRACKET	= 44,///Nuevo token agregado
     LCURLY		= 45,
     RCURLY		= 46,
 
@@ -125,35 +125,35 @@ final class Token extends Object {
     "<identifier>",
     "<operator>",
     "array",
-    "choose",
+    "choose",///Nuevo token agregado
     "const",
     "do",
     "else",
-    "elsif",
+    "elsif",///Nuevo token agregado
     "end",
-    "for",
-    "from",
+    "for",///Nuevo token agregado
+    "from",///Nuevo token agregado
     "func",
     "if",
     "in",
     "let",
-    "loop",
-    "nothing",
+    "loop",///Nuevo token agregado
+    "nothing",///Nuevo token agregado
     "of",
-    "package",
-    "private",
+    "package",///Nuevo token agregado
+    "private",///Nuevo token agregado
     "proc",
     "record",
-    "recursive",
+    "recursive",///Nuevo token agregado
     "then",
-    "to",
+    "to",///Nuevo token agregado
     "type",
-    "until",
+    "until",///Nuevo token agregado
     "var",
-    "when",
+    "when",///Nuevo token agregado
     "while",
     "|",
-    "$",
+    "$",///Nuevo token agregado
     "..",
     ".",
     ":",
