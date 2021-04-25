@@ -93,7 +93,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * Generates DefaultMutableTreeNodes, used to draw a JTree.
  *
- * @author Luis Leopoldo Pérez <luiperpe@ns.isi.ulatina.ac.cr>
+ * @author Luis Leopoldo Pï¿½rez <luiperpe@ns.isi.ulatina.ac.cr>
  */
 
 
@@ -529,10 +529,15 @@ public class TreeVisitor implements Visitor {
     
     @Override
     public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-       return(createNullary("Long Identifier" ));
+       //return(createNullary("Long Identifier" ));
+       if (ast.I1 == null)
+               return (createUnary("Long Identifier",ast.I2));
+       
+       return(createBinary("Long Identifier" ,ast.I1,ast.I2));
     }
     
     public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
-        return(createUnary("LongIdentifier Type Denoter", ast.L));
+        return (createUnary("Long Identifier",ast.L));
+        //return(createUnary("LongIdentifier Type Denoter", ast.L));
     }
 }
