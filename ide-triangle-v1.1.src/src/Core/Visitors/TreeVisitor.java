@@ -76,6 +76,7 @@ import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
+import Triangle.AbstractSyntaxTrees.TypeDenoter;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
 import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.UntilCommand;
@@ -93,7 +94,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * Generates DefaultMutableTreeNodes, used to draw a JTree.
  *
- * @author Luis Leopoldo Pï¿½rez <luiperpe@ns.isi.ulatina.ac.cr>
+ * @author Luis Leopoldo Pérez <luiperpe@ns.isi.ulatina.ac.cr>
  */
 
 
@@ -200,7 +201,7 @@ public class TreeVisitor implements Visitor {
     public Object visitProcDeclaration(ProcDeclaration ast, Object obj) {
         return(createTernary("Procedure Declaration", ast.I, ast.FPS, ast.C));        
     }
-    
+        
     public Object visitSequentialDeclaration(SequentialDeclaration ast, Object obj) {
         return(createBinary("Sequential Declaration", ast.D1, ast.D2));
     }
@@ -216,6 +217,11 @@ public class TreeVisitor implements Visitor {
     public Object visitVarDeclaration(VarDeclaration ast, Object obj) {
         return(createBinary("Variable Declaration", ast.I, ast.T));
     }
+    /*
+    public Object visitVarDeclaration(VarDeclaration ast, Object obj) {
+        return(createBinary("Variable Declaration", ast.I, ast.T));
+    }
+    */
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" Aggregates ">
@@ -415,7 +421,7 @@ public class TreeVisitor implements Visitor {
     public DefaultMutableTreeNode createBinary(String caption, AST child1, AST child2) {
         DefaultMutableTreeNode t = new DefaultMutableTreeNode(caption);
         t.add((DefaultMutableTreeNode)child1.visit(this, null));
-        t.add((DefaultMutableTreeNode)child2.visit(this, null));
+        //t.add((DefaultMutableTreeNode)child2.visit(this, null));
        
         return(t);
     }
@@ -507,29 +513,28 @@ public class TreeVisitor implements Visitor {
     }
 
     @Override
-    public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object visitProcFuncDeclaration(ProcFuncDeclaration ast, Object o) {
+        return (createBinary("Proc Fun Declaration", ast.PFD1, ast.PFD2));
     }
 
     @Override
     public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
-        return (createNullary("Declaration"));
-        // return (createBinaryDeclaration("Private Declaration ", (Declaration)privateDeclaration.PFD1, (Declaration)privateDeclaration.PFD2));
+          
+        return (createBinary("Private Declaration ", privateDeclaration.PFD1, privateDeclaration.PFD2));
     }
 
     @Override
     public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createBinary("Package Declaration", ast.I, ast.D));
     }
 
     @Override
     public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (createBinary("Package Declaration Tree", ast.PDT1, ast.PDT2));
     }
     
     @Override
     public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-       //return(createNullary("Long Identifier" ));
        if (ast.I1 == null)
                return (createUnary("Long Identifier",ast.I2));
        
@@ -537,7 +542,6 @@ public class TreeVisitor implements Visitor {
     }
     
     public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
-        return (createUnary("Long Identifier",ast.L));
-        //return(createUnary("LongIdentifier Type Denoter", ast.L));
+        return (createUnary("Long Identifier",ast.L)); 
     }
 }
