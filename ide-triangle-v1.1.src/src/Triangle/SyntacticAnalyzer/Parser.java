@@ -1,4 +1,4 @@
-/*
+ /*
  * @(#)Parser.java                        2.1 2003/10/07
  *
  * Copyright (C) 1999, 2003 D.A. Watt and D.F. Brown
