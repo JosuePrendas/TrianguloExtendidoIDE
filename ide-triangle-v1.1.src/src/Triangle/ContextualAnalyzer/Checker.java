@@ -40,15 +40,15 @@ public final class Checker implements Visitor {
 
     Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      //reportUndeclared(ast.L);
+      reportUndeclared(ast.L.I2);
     }
     else if (binding instanceof ProcDeclaration) {
       ast.APS.visit(this, ((ProcDeclaration) binding).FPS);
     } else if (binding instanceof ProcFormalParameter) {
       ast.APS.visit(this, ((ProcFormalParameter) binding).FPS);
     } else {
-      //reporter.reportError("\"%\" is not a procedure identifier",
-      //                   ast.I.spelling, ast.I.position);
+      reporter.reportError("\"%\" is not a procedure identifier",
+                         ast.L.I2.spelling, ast.L.I2.position);
     }
     return null;
   }
@@ -62,12 +62,21 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E.position);
     ast.C1.visit(this, null);
+    if(ast.EI!=null)
+        ast.EI.visit(this,null);
     ast.C2.visit(this, null);
     return null;
   }
 
   @Override
   public Object visitElsifCommand(ElsifCommand ast, Object o) {
+    if(ast.EI!=null)
+        ast.EI.visit(this, null);
+    ast.E.visit(this, null);
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (! eType.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    ast.C1.visit(this,null);
     return null;
   }
 
@@ -95,41 +104,76 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitUntilCommand(UntilCommand ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (! eType.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    ast.C.visit(this, null);
     return null;
   }
 
   @Override
   public Object visitLoopWhileCommand(LoopWhileCommand loopWhileCommand, Object o) {
+    loopWhileCommand.W.visit(this, null);
     return null;
   }
 
   @Override
   public Object visitLoopUntilCommand(LoopUntilCommand loopUntilCommand, Object o) {
+    loopUntilCommand.U.visit(this, null);
     return null;
   }
 
   @Override
   public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (! eType.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    ast.C1.visit(this, null);
     return null;
   }
 
   @Override
   public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (! eType.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    ast.C1.visit(this, null);
     return null;
   }
 
   @Override
   public Object visitLoopCommandForWhile(LoopCommandForWhile loopCommandForWhile, Object o) {
+    TypeDenoter eType = (TypeDenoter) loopCommandForWhile.E1.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", loopCommandForWhile.E1.position);
+    idTable.openScope();
+    loopCommandForWhile.IE.visit(this, null);
+    loopCommandForWhile.W.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
   @Override
   public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E1.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E1.position);
+    idTable.openScope();
+    ast.IE.visit(this, null);
+    ast.U.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
   @Override
   public Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o) {
+    TypeDenoter eType = (TypeDenoter) loopCommandForDo.E1.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", loopCommandForDo.E1.position);
+    idTable.openScope();
+    loopCommandForDo.IE.visit(this, null);
+    loopCommandForDo.C1.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
@@ -176,9 +220,10 @@ public final class Checker implements Visitor {
   }
 
   public Object visitCallExpression(CallExpression ast, Object o) {
+    //falta meter lo de packages
     Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      //reportUndeclared(ast.L);
+      reportUndeclared(ast.L.I2);
       ast.type = StdEnvironment.errorType;
     } else if (binding instanceof FuncDeclaration) {
       ast.APS.visit(this, ((FuncDeclaration) binding).FPS);
@@ -187,8 +232,8 @@ public final class Checker implements Visitor {
       ast.APS.visit(this, ((FuncFormalParameter) binding).FPS);
       ast.type = ((FuncFormalParameter) binding).T;
     } else {
-      //reporter.reportError("\"%\" is not a function identifier",
-      //                   ast.I.spelling, ast.I.position);
+      reporter.reportError("\"%\" is not a function identifier",
+                         ast.L.I2.spelling, ast.L.I2.position);
     }
     return ast.type;
   }
@@ -262,6 +307,12 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E.position);
+    //revisar esta parte
+    Declaration controlVariable = new ConstDeclaration(ast.I, ast.E, ast.position);
+    controlVariable.visit(this, null);
     return null;
   }
 
@@ -329,7 +380,10 @@ public final class Checker implements Visitor {
   }
 
   public Object visitVarDeclaration(VarDeclaration ast, Object o) {
-    ast.T = (TypeDenoter) ast.T.visit(this, null);
+    if(ast.T != null)
+        ast.T = (TypeDenoter) ast.T.visit(this, null);
+    else
+        ast.T = (TypeDenoter) ast.E.visit(this, null);
     idTable.enter (ast.I.spelling, ast);
     if (ast.duplicated)
       reporter.reportError ("identifier \"%\" already declared",
@@ -340,6 +394,41 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
+    //esta cosa se puede mejorar, usar visits en vez de esta cosa alambrada fea
+    if(procFuncDeclaration.PFD2 instanceof ProcDeclaration){
+        ProcDeclaration procDeclaration = (ProcDeclaration) procFuncDeclaration.PFD2;
+        idTable.enter (procDeclaration.I.spelling, procDeclaration); // permits recursion
+        if (procDeclaration.duplicated)
+          reporter.reportError ("identifier \"%\" already declared",
+                                procDeclaration.I.spelling, procDeclaration.position);
+        idTable.openScope();
+        procDeclaration.FPS.visit(this, null);
+        idTable.closeScope();
+        procFuncDeclaration.PFD1.visit(this, null);
+        idTable.openScope();
+        procDeclaration.FPS.visit(this, null);
+        procDeclaration.C.visit(this, null);
+        idTable.closeScope();
+    }
+    else{
+        FuncDeclaration funcDeclaration = (FuncDeclaration) procFuncDeclaration.PFD2;
+        funcDeclaration.T = (TypeDenoter) funcDeclaration.T.visit(this, null);
+        idTable.enter (funcDeclaration.I.spelling, funcDeclaration); // permits recursion
+        if (funcDeclaration.duplicated)
+          reporter.reportError ("identifier \"%\" already declared",
+                                funcDeclaration.I.spelling, funcDeclaration.position);
+        idTable.openScope();
+        funcDeclaration.FPS.visit(this, null);
+        idTable.closeScope();
+        procFuncDeclaration.PFD1.visit(this, null);
+        idTable.openScope();
+        funcDeclaration.FPS.visit(this, null);
+        TypeDenoter eType = (TypeDenoter) funcDeclaration.E.visit(this, null);
+        idTable.closeScope();
+        if (!funcDeclaration.T.equals(eType))
+          reporter.reportError ("body of function \"%\" has wrong type",
+                                funcDeclaration.I.spelling, funcDeclaration.E.position);
+    }
     return null;
   }
 
@@ -666,7 +755,15 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-    return null;
+    //falta manejar lo de packages
+    Declaration binding = null;
+    if(ast.I1==null){
+        binding = (Declaration) ast.I2.visit(this, null);
+    }
+    else{
+        //hacer la cosa pero con packages
+    }
+    return binding;
   }
 
   // Value-or-variable names
@@ -706,11 +803,12 @@ public final class Checker implements Visitor {
   }
 
   public Object visitSimpleVname(SimpleVname ast, Object o) {
+    //falta meter lo de packages
     ast.variable = false;
     ast.type = StdEnvironment.errorType;
     Declaration binding = (Declaration) ast.I.visit(this, null);
     if (binding == null) {
-      //reportUndeclared(ast.I);
+      reportUndeclared(ast.I.I2);
     }
     else
       if (binding instanceof ConstDeclaration) {
@@ -726,8 +824,8 @@ public final class Checker implements Visitor {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
       } else {
-        //reporter.reportError ("\"%\" is not a const or var identifier",
-        //ast.I.spelling, ast.I.position);
+        reporter.reportError ("\"%\" is not a const or var identifier",
+        ast.I.I2.spelling, ast.I.I2.position);
       }
     return ast.type;
   }
