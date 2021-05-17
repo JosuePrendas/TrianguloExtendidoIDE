@@ -40,7 +40,10 @@ public final class Checker implements Visitor {
 
     Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      reportUndeclared(ast.L.I2);
+      if(ast.L.I1 != null)
+        reportUndeclared (ast.L);
+      else
+        reportUndeclared(ast.L.I2);
     }
     else if (binding instanceof ProcDeclaration) {
       ast.APS.visit(this, ((ProcDeclaration) binding).FPS);
@@ -223,7 +226,10 @@ public final class Checker implements Visitor {
     //falta meter lo de packages
     Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      reportUndeclared(ast.L.I2);
+      if(ast.L.I1 != null)
+        reportUndeclared (ast.L);
+      else
+        reportUndeclared(ast.L.I2);
       ast.type = StdEnvironment.errorType;
     } else if (binding instanceof FuncDeclaration) {
       ast.APS.visit(this, ((FuncDeclaration) binding).FPS);
@@ -439,11 +445,20 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
+    idTable.declarePackage(ast);
+    idTable.openPackage(ast.I.spelling);
+    ast.D.visit(this, null);
+    idTable.closePackage();
+    if (ast.duplicated)
+      reporter.reportError ("identifier \"%\" already declared",
+                            ast.I.spelling, ast.position);
     return null;
   }
 
   @Override
   public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
+    ast.PDT1.visit(this, null);
+    ast.PDT2.visit(this,null);
     return null;
   }
 
@@ -700,11 +715,14 @@ public final class Checker implements Visitor {
   public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
     Declaration binding = (Declaration) ast.L.visit(this, null);
     if (binding == null) {
-      //reportUndeclared (ast.L);
+      if(ast.L.I1 != null)
+        reportUndeclared (ast.L);
+      else
+        reportUndeclared(ast.L.I2);
       return StdEnvironment.errorType;
     } else if (! (binding instanceof TypeDeclaration)) {
-      //reporter.reportError ("\"%\" is not a type identifier",
-                            //ast.L.spelling, ast.L.position);
+      reporter.reportError ("\"%\" is not a type identifier",
+                            ast.L.I2.spelling, ast.L.position);
       return StdEnvironment.errorType;
     }
     return ((TypeDeclaration) binding).T;
@@ -755,13 +773,14 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-    //falta manejar lo de packages
     Declaration binding = null;
     if(ast.I1==null){
         binding = (Declaration) ast.I2.visit(this, null);
     }
     else{
-        //hacer la cosa pero con packages
+        idTable.openPackage(ast.I1.spelling);
+        binding = (Declaration) ast.I2.visit(this, null);
+        idTable.closePackage();
     }
     return binding;
   }
@@ -808,7 +827,10 @@ public final class Checker implements Visitor {
     ast.type = StdEnvironment.errorType;
     Declaration binding = (Declaration) ast.I.visit(this, null);
     if (binding == null) {
-      reportUndeclared(ast.I.I2);
+      if(ast.I.I1!=null)
+        reportUndeclared(ast.I);
+      else
+        reportUndeclared (ast.I.I2);
     }
     else
       if (binding instanceof ConstDeclaration) {
@@ -850,6 +872,11 @@ public final class Checker implements Visitor {
   // Programs
 
   public Object visitProgram(Program ast, Object o) {
+    if(ast.PDT != null){
+        idTable.openPackageDeclarationPhase();
+        ast.PDT.visit(this,null);
+        idTable.closePackageDeclarationPhase();
+    }
     ast.C.visit(this, null);
     return null;
   }
@@ -871,11 +898,11 @@ public final class Checker implements Visitor {
 
   public Checker (ErrorReporter reporter) {
     this.reporter = reporter;
-    this.idTable = new IdentificationTable ();
+    this.idTable = new PackagesIdentificationTable ();
     establishStdEnvironment();
   }
 
-  private IdentificationTable idTable;
+  private PackagesIdentificationTable idTable;
   private static SourcePosition dummyPos = new SourcePosition();
   private ErrorReporter reporter;
 
@@ -884,6 +911,10 @@ public final class Checker implements Visitor {
 
   private void reportUndeclared (Terminal leaf) {
     reporter.reportError("\"%\" is not declared", leaf.spelling, leaf.position);
+  }
+  
+  private void reportUndeclared (LongIdentifier leaf) {
+    reporter.reportError("\"%\" is not declared", leaf.I1.spelling + "$" + leaf.I2.spelling, leaf.position);
   }
 
 
