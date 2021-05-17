@@ -400,23 +400,28 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
-    //esta cosa se puede mejorar, usar visits en vez de esta cosa alambrada fea
     if(procFuncDeclaration.PFD2 instanceof ProcDeclaration){
+        //se declara el proc
         ProcDeclaration procDeclaration = (ProcDeclaration) procFuncDeclaration.PFD2;
         idTable.enter (procDeclaration.I.spelling, procDeclaration); // permits recursion
         if (procDeclaration.duplicated)
           reporter.reportError ("identifier \"%\" already declared",
                                 procDeclaration.I.spelling, procDeclaration.position);
+        //se declaran los parametros
         idTable.openScope();
         procDeclaration.FPS.visit(this, null);
         idTable.closeScope();
+        //se van a declarar los demas proc func
         procFuncDeclaration.PFD1.visit(this, null);
         idTable.openScope();
+        //se agregan nuevamente los parametros a la tabla
         procDeclaration.FPS.visit(this, null);
+        //se verifica el comando del proc, ya teniendo todos los demas proc func declarados y con sus respectivos parametros
         procDeclaration.C.visit(this, null);
         idTable.closeScope();
     }
     else{
+        //se realiza el mismo proceso de arriba, pero esta vez con func
         FuncDeclaration funcDeclaration = (FuncDeclaration) procFuncDeclaration.PFD2;
         funcDeclaration.T = (TypeDenoter) funcDeclaration.T.visit(this, null);
         idTable.enter (funcDeclaration.I.spelling, funcDeclaration); // permits recursion
@@ -440,19 +445,28 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
+    //se abre las declaraciones privadas
     idTable.openPrivateDeclaration();
+    //se agregan las declaraciones privadas
     privateDeclaration.PFD1.visit(this, null);
+    //se cierra el scope para agregar declaraciones privadas
     idTable.closePrivateScope();
+    //declaraciones privadas son visibles, se agregan declaraciones que se exportaran
     privateDeclaration.PFD2.visit(this,null);
+    //se eliminan las declaraciones privadas, ya no son visibles
     idTable.closePrivateDeclaration();
     return null;
   }
 
   @Override
   public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
+    //se declara el paquete
     idTable.declarePackage(ast);
+    //se usa la tabla de id del paquete
     idTable.openPackage(ast.I.spelling);
+    //se hacen las declaraciones del paquete
     ast.D.visit(this, null);
+    //se vuelve a la tabla default
     idTable.closePackage();
     if (ast.duplicated)
       reporter.reportError ("identifier \"%\" already declared",

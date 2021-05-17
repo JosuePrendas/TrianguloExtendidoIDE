@@ -90,22 +90,22 @@ public class Parser {
 
     try {
       PackageDeclarationTree pdt = null;
-      SourcePosition declarationPos = new SourcePosition();
-      start(declarationPos);
       while(currentToken.kind==Token.PACKAGE){
+        SourcePosition declarationPos = new SourcePosition();
+        start(declarationPos);
         acceptIt();
         Identifier iAST = parseIdentifier();
         accept(Token.IS);
         Declaration dAST = parseDeclaration();
         accept(Token.END);
         accept(Token.SEMICOLON);
+        finish(declarationPos);
         if(pdt==null) {
           pdt = new PackageDeclaration(iAST, dAST, declarationPos);
         }
         else{
           pdt = new PackageDeclarationTree(pdt, new PackageDeclaration(iAST, dAST, declarationPos),declarationPos);
         }
-        finish(declarationPos);
       }
       Command cAST = parseCommand();
       programAST = new Program(pdt, cAST, previousTokenPosition);
