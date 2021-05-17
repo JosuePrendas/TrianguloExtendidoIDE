@@ -17,12 +17,28 @@ public class PackagesIdentificationTable {
     private HashMap<String,IdentificationTable> packagesIdTable;
     private IdentificationTable currentIdTable;
     private boolean packageDeclarationPhase;
+    private IdentificationTable privateIdentificationTable;
+    private boolean privateScope;
     
     public PackagesIdentificationTable() {
         packagesIdTable = new HashMap<>();
         currentIdTable = new IdentificationTable();
         packagesIdTable.put(null, currentIdTable);
         packageDeclarationPhase = false;
+        privateScope = false;
+    }
+    
+    public void openPrivateDeclaration(){
+        privateIdentificationTable = new IdentificationTable();
+        privateScope = true;
+    }
+    
+    public void closePrivateScope(){
+        privateScope = false;
+    }
+    
+    public void closePrivateDeclaration(){
+        privateIdentificationTable = null;
     }
     
     public void openPackageDeclarationPhase(){
@@ -48,11 +64,18 @@ public class PackagesIdentificationTable {
     }
     
     public void enter (String id, Declaration attr) {
-        currentIdTable.enter(id, attr);
+        if(privateScope)
+            privateIdentificationTable.enter(id, attr);
+        else
+            currentIdTable.enter(id, attr);
     }
     
     public Declaration retrieve (String id) {
-        Declaration value = currentIdTable.retrieve(id);
+        Declaration value = null;
+        if(privateIdentificationTable != null)
+            value = privateIdentificationTable.retrieve(id);
+        if(value == null)
+            value = currentIdTable.retrieve(id);
         if(value == null && packageDeclarationPhase)
             return packagesIdTable.get(null).retrieve(id);
         return value;

@@ -440,6 +440,11 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
+    idTable.openPrivateDeclaration();
+    privateDeclaration.PFD1.visit(this, null);
+    idTable.closePrivateScope();
+    privateDeclaration.PFD2.visit(this,null);
+    idTable.closePrivateDeclaration();
     return null;
   }
 
