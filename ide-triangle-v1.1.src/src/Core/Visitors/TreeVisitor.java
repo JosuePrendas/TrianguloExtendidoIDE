@@ -67,7 +67,6 @@ import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
-//import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -325,11 +324,7 @@ public class TreeVisitor implements Visitor {
     public Object visitErrorTypeDenoter(ErrorTypeDenoter ast, Object obj) {
         return(createNullary("error"));
     }
-    /*
-    public Object visitSimpleTypeDenoter(SimpleTypeDenoter ast, Object obj) {
-        return(createUnary("Simple Type Denoter", ast.I));
-    }
-    */
+    
     public Object visitIntTypeDenoter(IntTypeDenoter ast, Object obj) {
         return(createNullary("int"));
     }
@@ -381,7 +376,7 @@ public class TreeVisitor implements Visitor {
     }
     
     public Object visitProgram(Program ast, Object obj) {
-        return(createUnary("Program", ast.C));
+        return(createBinary("Program",ast.PDT ,ast.C));
     }
     // </editor-fold>
 
@@ -421,7 +416,7 @@ public class TreeVisitor implements Visitor {
     public DefaultMutableTreeNode createBinary(String caption, AST child1, AST child2) {
         DefaultMutableTreeNode t = new DefaultMutableTreeNode(caption);
         t.add((DefaultMutableTreeNode)child1.visit(this, null));
-        //t.add((DefaultMutableTreeNode)child2.visit(this, null));
+        t.add((DefaultMutableTreeNode)child2.visit(this, null));
        
         return(t);
     }
@@ -464,7 +459,9 @@ public class TreeVisitor implements Visitor {
 
     @Override
     public Object visitElsifCommand(ElsifCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(ast.EI!=null)
+            return (createTernary("Elsif Command", ast.EI, ast.E, ast.C1));
+        return (createBinary("Elsif Command", ast.E, ast.C1));
     }
 
     @Override
