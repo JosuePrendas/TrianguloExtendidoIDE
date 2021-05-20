@@ -751,8 +751,8 @@ public class Parser {
       finish(declarationPos);
       declarationAST = new ProcDeclaration(iAST, fpsAST, cAST, declarationPos);
     }
-    else{
-      accept(Token.FUNC);
+    else if (currentToken.kind ==Token.FUNC){
+      acceptIt();
       Identifier iAST = parseIdentifier();
       accept(Token.LPAREN);
       FormalParameterSequence fpsAST = parseFormalParameterSequence();
@@ -763,6 +763,9 @@ public class Parser {
       Expression eAST = parseExpression();
       finish(declarationPos);
       declarationAST = new FuncDeclaration(iAST, fpsAST, tAST, eAST, declarationPos);
+    }
+    else{
+        syntacticError("\"%\" expected here", Token.spell(Token.PROC) + " or " + Token.spell(Token.FUNC));
     }
     return declarationAST;
   }
