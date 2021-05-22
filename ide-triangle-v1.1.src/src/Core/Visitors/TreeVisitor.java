@@ -376,7 +376,9 @@ public class TreeVisitor implements Visitor {
     }
     
     public Object visitProgram(Program ast, Object obj) {
-        return(createBinary("Program",ast.PDT ,ast.C));
+        if (ast.PDT != null)
+            return(createBinary("Program",ast.PDT ,ast.C));
+        return(createUnary("Program",ast.C));
     }
     // </editor-fold>
 
