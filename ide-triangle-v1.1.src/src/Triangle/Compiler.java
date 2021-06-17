@@ -80,16 +80,16 @@ public class Compiler {
         scanner  = new Scanner(source,htmlWriter);
         reporter = new ErrorReporter();
         parser   = new Parser(scanner, reporter,htmlWriter);
-        //checker  = new Checker(reporter);
-        //encoder  = new Encoder(reporter);
-        //drawer   = new Drawer();
+        checker  = new Checker(reporter);
+        encoder  = new Encoder(reporter);
+        drawer   = new Drawer();
 
         // scanner.enableDebugging();
         theAST = parser.parseProgram();				// 1st pass
         Writer writer = new Writer(source.getName());
         if(theAST!=null)
             writer.write(theAST);
-        /*
+        
         if (reporter.numErrors == 0) {
             //if (showingAST) {
             //    drawer.draw(theAST);
@@ -104,7 +104,7 @@ public class Compiler {
                 encoder.encodeRun(theAST, showingTable);	// 3rd pass
             }
         }
-        */
+        
 
         boolean successful = (reporter.numErrors == 0);
             if (successful) {

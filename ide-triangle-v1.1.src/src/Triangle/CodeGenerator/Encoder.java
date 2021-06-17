@@ -100,27 +100,65 @@ public final class Encoder implements Visitor {
 
   @Override
   public Object visitUntilCommand(UntilCommand ast, Object o) {
-    return null;
+    //Agregado 
+    Frame frame = (Frame) o;
+    int jumpAddr, loopAddr;
+
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C.visit(this, frame);
+    patch(jumpAddr, nextInstrAddr);
+    ast.E.visit(this, frame);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+     
+    return null;  
   }
 
   @Override
   public Object visitLoopWhileCommand(LoopWhileCommand loopWhileCommand, Object o) {
+    //Agregado
+    
+    
     return null;
   }
 
   @Override
   public Object visitLoopUntilCommand(LoopUntilCommand loopUntilCommand, Object o) {
-    return null;
+      return null;
   }
 
   @Override
   public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
+    Frame frame = (Frame) o;
+    int jumpAddr, loopAddr;
+
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C1.visit(this, frame);
+    patch(jumpAddr, nextInstrAddr);
+    ast.E.visit(this, frame);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    
     return null;
   }
 
   @Override
   public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
-    return null;
+    //Agregado
+    Frame frame = (Frame) o;
+    int jumpAddr, loopAddr;
+
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C1.visit(this, frame);
+    patch(jumpAddr, nextInstrAddr);
+    ast.E.visit(this, frame);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+     
+        return null;
   }
 
   @Override
@@ -338,16 +376,20 @@ public final class Encoder implements Visitor {
     ast.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
     writeTableDetails(ast);
     return new Integer(extraSize);
+    
   }
 
   @Override
   public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
+      
+      
     return null;
   }
 
   @Override
   public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
-    return null;
+    
+      return null;
   }
 
   @Override
@@ -1011,4 +1053,8 @@ public final class Encoder implements Visitor {
       }
     }
   }
+
+
+
+
 }
