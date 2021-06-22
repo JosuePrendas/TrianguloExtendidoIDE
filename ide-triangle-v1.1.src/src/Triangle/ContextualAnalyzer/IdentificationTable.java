@@ -20,10 +20,14 @@ public final class IdentificationTable {
 
   private int level;
   private IdEntry latest;
+  private IdentificationTable privateIdentificationTable;
+  private boolean privateScope;
 
   public IdentificationTable () {
     level = 0;
     latest = null;
+    privateScope = false;
+    privateIdentificationTable = null;
   }
 
   // Opens a new level in the identification table, 1 higher than the
@@ -57,25 +61,39 @@ public final class IdentificationTable {
   // same identifier at the current level.
 
   public void enter (String id, Declaration attr) {
+    if(privateScope)
+        privateIdentificationTable.enter(id, attr);
+    else if(getPrivateScope())
+        privateIdentificationTable.enter(id, attr);
+    else{  
+        IdEntry entry = this.latest;
+        boolean present = false, searching = true;
 
-    IdEntry entry = this.latest;
-    boolean present = false, searching = true;
+        // Check for duplicate entry ...
+        while (searching) {
+          if (entry == null || entry.level < this.level)
+            searching = false;
+          else if (entry.id.equals(id)) {
+            present = true;
+            searching = false;
+           } else
+           entry = entry.previous;
+        }
 
-    // Check for duplicate entry ...
-    while (searching) {
-      if (entry == null || entry.level < this.level)
-        searching = false;
-      else if (entry.id.equals(id)) {
-        present = true;
-        searching = false;
-       } else
-       entry = entry.previous;
+        attr.duplicated = present;
+        // Add new entry ...
+        entry = new IdEntry(id, attr, this.level, this.latest);
+        this.latest = entry;
     }
-
-    attr.duplicated = present;
-    // Add new entry ...
-    entry = new IdEntry(id, attr, this.level, this.latest);
-    this.latest = entry;
+  }
+  
+  public boolean getPrivateScope(){
+      if(privateIdentificationTable!=null){
+          if(privateIdentificationTable.isLeaf())
+              return privateScope;
+          return privateIdentificationTable.getPrivateScope();
+      }
+      return privateScope;
   }
 
   // Finds an entry for the given identifier in the identification table,
@@ -84,10 +102,16 @@ public final class IdentificationTable {
   // Returns null iff no entry is found.
   // otherwise returns the attribute field of the entry found.
 
-  public Declaration retrieve (String id) {
-
+  public Declaration retrieve (String id) {      
     IdEntry entry;
     Declaration attr = null;
+    
+    if(privateIdentificationTable != null){
+        attr = privateIdentificationTable.retrieve(id);
+        if(attr != null)
+            return attr;
+    }
+    
     boolean present = false, searching = true;
 
     entry = this.latest;
@@ -104,5 +128,37 @@ public final class IdentificationTable {
 
     return attr;
   }
+  
+  //Se crea una nueva tabla de id solo para las declaraciones privadas
+    public void openPrivateDeclaration(){
+        if(privateIdentificationTable != null)
+            privateIdentificationTable.openPrivateDeclaration();
+        else{
+            privateIdentificationTable = new IdentificationTable();
+            privateScope = true;
+        }
+    }
+    
+    //Se cierra el scope de las declaraciones privadas
+    //esto es para que no se agreguen mas declaraciones privadas
+    //pero se mantenga la visibilidad de ellas
+    public void closePrivateScope(){
+        if(!privateIdentificationTable.isLeaf())
+            privateIdentificationTable.closePrivateScope();
+        else
+            privateScope = false;
+    }
+    
+    //se eliminan las declaraciones privadas para mantener solo las que se deben exportar 
+    public void closePrivateDeclaration(){
+        if(privateIdentificationTable.isLeaf())
+            privateIdentificationTable = null;
+        else
+            privateIdentificationTable.closePrivateDeclaration();
+    }
+    
+    public boolean isLeaf(){
+        return privateIdentificationTable==null;
+    }
 
 }

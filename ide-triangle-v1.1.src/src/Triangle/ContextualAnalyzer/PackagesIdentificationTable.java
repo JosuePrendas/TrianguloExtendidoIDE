@@ -17,34 +17,30 @@ public class PackagesIdentificationTable {
     private HashMap<String,IdentificationTable> packagesIdTable;
     private IdentificationTable currentIdTable;
     private boolean packageDeclarationPhase;
-    private IdentificationTable privateIdentificationTable;
-    private boolean privateScope;
     
     public PackagesIdentificationTable() {
         packagesIdTable = new HashMap<>();
         currentIdTable = new IdentificationTable();
         packagesIdTable.put(null, currentIdTable);
         packageDeclarationPhase = false;
-        privateScope = false;
     }
     
     
     //Se crea una nueva tabla de id solo para las declaraciones privadas
     public void openPrivateDeclaration(){
-        privateIdentificationTable = new IdentificationTable();
-        privateScope = true;
+        currentIdTable.openPrivateDeclaration();
     }
     
     //Se cierra el scope de las declaraciones privadas
     //esto es para que no se agreguen mas declaraciones privadas
     //pero se mantenga la visibilidad de ellas
     public void closePrivateScope(){
-        privateScope = false;
+        currentIdTable.closePrivateScope();
     }
     
     //se eliminan las declaraciones privadas para mantener solo las que se deben exportar 
     public void closePrivateDeclaration(){
-        privateIdentificationTable = null;
+        currentIdTable.closePrivateDeclaration();
     }
     
     //se abre la fase de declaraciones de paquetes, esto es para que si hay
@@ -83,10 +79,7 @@ public class PackagesIdentificationTable {
     //en caso de que se este en private scope, las declaraciones ingresadas son privadas
     //caso contrario son del scope normal
     public void enter (String id, Declaration attr) {
-        if(privateScope)
-            privateIdentificationTable.enter(id, attr);
-        else
-            currentIdTable.enter(id, attr);
+        currentIdTable.enter(id, attr);
     }
     
     //en caso de que exista la tabla de declaraciones privadas, significa que se estan haciendo
@@ -95,8 +88,6 @@ public class PackagesIdentificationTable {
     //si nuevamente no se encuentra, y se esta en la etapa de declaracion de paquetes, se busca en la tabla default
     public Declaration retrieve (String id) {
         Declaration value = null;
-        if(privateIdentificationTable != null)
-            value = privateIdentificationTable.retrieve(id);
         if(value == null)
             value = currentIdTable.retrieve(id);
         if(value == null && packageDeclarationPhase)
