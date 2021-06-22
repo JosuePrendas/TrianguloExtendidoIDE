@@ -616,12 +616,12 @@ public class Main extends javax.swing.JFrame {
             output.setDelegate(delegateConsole);            
             if (compiler.compileProgram(desktopPane.getSelectedFrame().getTitle())) {           
                 output.setDelegate(delegateTAMCode);
-                //disassembler.Disassemble(desktopPane.getSelectedFrame().getTitle().replace(".tri", ".tam"));
+                disassembler.Disassemble(desktopPane.getSelectedFrame().getTitle().replace(".tri", ".tam")); //se descomento
                 ((FileFrame)desktopPane.getSelectedFrame()).setTree((DefaultMutableTreeNode)treeVisitor.visitProgram(compiler.getAST(), null));
-                //((FileFrame)desktopPane.getSelectedFrame()).setTable(tableVisitor.getTable(compiler.getAST()));
+                ((FileFrame)desktopPane.getSelectedFrame()).setTable(tableVisitor.getTable(compiler.getAST())); //se descomento
                 
                 runMenuItem.setEnabled(false);
-                buttonRun.setEnabled(false);
+                buttonRun.setEnabled(true);
             } else {
                 ((FileFrame)desktopPane.getSelectedFrame()).highlightError(compiler.getErrorPosition());
                 runMenuItem.setEnabled(false);
