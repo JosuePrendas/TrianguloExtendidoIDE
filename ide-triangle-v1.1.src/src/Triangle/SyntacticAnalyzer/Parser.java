@@ -228,6 +228,20 @@ public class Parser {
     return commandAST;
   }
 
+    LongIdentifier parseLongIdentifier()throws SyntaxError {
+        SourcePosition commandPos = new SourcePosition();
+        start(commandPos);
+        Identifier iAST = parseIdentifier();
+        LongIdentifier liAST = new LongIdentifier(iAST,commandPos);
+        if(currentToken.kind == Token.DOLAR) {
+          acceptIt();
+          Identifier i2AST = parseIdentifier();
+          liAST = new LongIdentifier(iAST, i2AST, commandPos);
+        }
+        finish(commandPos);
+        return liAST;
+    }
+  
   Command parseSingleCommand() throws SyntaxError {
     Command commandAST = null; // in case there's a syntactic error
 
@@ -237,13 +251,7 @@ public class Parser {
 
       case Token.IDENTIFIER:
         {
-          Identifier iAST = parseIdentifier();
-          LongIdentifier liAST = new LongIdentifier(iAST,commandPos);
-          if(currentToken.kind == Token.DOLAR) {
-            acceptIt();
-            Identifier i2AST = parseIdentifier();
-            liAST = new LongIdentifier(iAST, i2AST, commandPos);
-          }
+          LongIdentifier liAST = parseLongIdentifier();
           if (currentToken.kind == Token.LPAREN) {
             acceptIt();
             ActualParameterSequence apsAST = parseActualParameterSequence();
@@ -525,13 +533,7 @@ public class Parser {
       break;
 
     case Token.IDENTIFIER: {
-      Identifier iAST = parseIdentifier();
-      LongIdentifier liAST = new LongIdentifier(iAST, expressionPos);
-      if (currentToken.kind == Token.DOLAR) {
-        acceptIt();
-        Identifier i2AST = parseIdentifier();
-        liAST = new LongIdentifier(iAST, i2AST, expressionPos);
-      }
+      LongIdentifier liAST = parseLongIdentifier();
       if (currentToken.kind == Token.LPAREN) {
         acceptIt();
 
@@ -621,14 +623,7 @@ public class Parser {
 
   Vname parseVname () throws SyntaxError {
     Vname vnameAST = null; // in case there's a syntactic error
-    SourcePosition position = new SourcePosition();
-    Identifier iAST = parseIdentifier();
-    LongIdentifier liAST = new LongIdentifier(iAST, position);
-    if (currentToken.kind == Token.DOLAR) {
-      acceptIt();
-      Identifier i2AST = parseIdentifier();
-      liAST = new LongIdentifier(iAST, i2AST, position);
-    }
+    LongIdentifier liAST = parseLongIdentifier();
     vnameAST = parseRestOfVname(liAST);
     return vnameAST;
   }
@@ -1080,13 +1075,7 @@ public class Parser {
 
     case Token.IDENTIFIER:
       {
-        Identifier iAST = parseIdentifier();
-        LongIdentifier liAST = new LongIdentifier(iAST,typePos);
-        if(currentToken.kind == Token.DOLAR){
-          acceptIt();
-          Identifier i2AST = parseIdentifier();
-          liAST = new LongIdentifier(iAST,i2AST,typePos);
-        }
+        LongIdentifier liAST = parseLongIdentifier();
         finish(typePos);
         typeAST = new LongIdentifierTypeDenoter(liAST, typePos);
       }
