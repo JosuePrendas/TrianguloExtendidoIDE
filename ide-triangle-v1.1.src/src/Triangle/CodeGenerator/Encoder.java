@@ -118,14 +118,19 @@ public final class Encoder implements Visitor {
   @Override
   public Object visitLoopWhileCommand(LoopWhileCommand loopWhileCommand, Object o) {
     //Agregado
-    
+    Frame frame = (Frame) o;
+    loopWhileCommand.W.visit(this, frame);  
     
     return null;
   }
 
   @Override
   public Object visitLoopUntilCommand(LoopUntilCommand loopUntilCommand, Object o) {
-      return null;
+    //Agregado
+    Frame frame = (Frame) o;
+    loopUntilCommand.U.visit(this, frame);    
+    
+    return null;
   }
 
   @Override
@@ -162,18 +167,95 @@ public final class Encoder implements Visitor {
   }
 
   @Override
-  public Object visitLoopCommandForWhile(LoopCommandForWhile loopCommandForWhile, Object o) {
-    return null;
+  public Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o) {
+    //Agregado
+    
+    Frame frame = (Frame) o;
+    int loopAddr, jumpComp, varForControl, extraSize1, extraSize2;
+
+    extraSize1 = (Integer) ast.IE.E.visit(this, frame);
+    Frame frame1 = new Frame (frame, extraSize1);
+    varForControl = nextInstrAddr;
+
+    extraSize2 = (Integer) ast.E1.visit(this, frame1);
+    jumpComp = nextInstrAddr;
+
+    Frame frame2 = new Frame (frame, extraSize2 + extraSize1);
+    loopAddr = nextInstrAddr;
+    
+  
+    ast.W.visit(this, frame2);
+    
+    emit(Machine.CALLop, varForControl, Machine.PBr, Machine.succDisplacement);
+    patch(jumpComp, nextInstrAddr);
+
+    emit(Machine.LOADop, extraSize1 + extraSize2, Machine.STr, -2);
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    emit(Machine.POPop, 0, 0, extraSize1 + extraSize2);
+    
+    return 0;
   }
 
   @Override
   public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
-    return null;
+    //Agregado
+    
+    Frame frame = (Frame) o;
+    int loopAddr, jumpComp, varForControl, extraSize1, extraSize2;
+
+    extraSize1 = (Integer) ast.IE.E.visit(this, frame);
+    Frame frame1 = new Frame (frame, extraSize1);
+    varForControl = nextInstrAddr;
+
+    extraSize2 = (Integer) ast.E1.visit(this, frame1);
+    jumpComp = nextInstrAddr;
+
+    Frame frame2 = new Frame (frame, extraSize2 + extraSize1);
+    loopAddr = nextInstrAddr;
+    
+  
+    ast.U.visit(this, frame2);
+    
+    emit(Machine.CALLop, varForControl, Machine.PBr, Machine.succDisplacement);
+    patch(jumpComp, nextInstrAddr);
+
+    emit(Machine.LOADop, extraSize1 + extraSize2, Machine.STr, -2);
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    emit(Machine.POPop, 0, 0, extraSize1 + extraSize2);
+    
+    return 0;
   }
 
   @Override
-  public Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o) {
-    return null;
+  public Object visitLoopCommandForDo(LoopCommandForDo ast, Object o) {
+    //Agregado
+    
+    Frame frame = (Frame) o;
+    int loopAddr, jumpComp, varForControl, extraSize1, extraSize2;
+
+    extraSize1 = (Integer) ast.IE.E.visit(this, frame);
+    Frame frame1 = new Frame (frame, extraSize1);
+    varForControl = nextInstrAddr;
+
+    extraSize2 = (Integer) ast.E1.visit(this, frame1);
+    jumpComp = nextInstrAddr;
+
+    Frame frame2 = new Frame (frame, extraSize2 + extraSize1);
+    loopAddr = nextInstrAddr;
+    
+  
+    ast.C1.visit(this, frame2);
+    emit(Machine.CALLop, varForControl, Machine.PBr, Machine.succDisplacement);
+    patch(jumpComp, nextInstrAddr);
+
+    emit(Machine.LOADop, extraSize1 + extraSize2, Machine.STr, -2);
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    emit(Machine.POPop, 0, 0, extraSize1 + extraSize2);
+
+  return 0;
   }
 
 
@@ -387,9 +469,12 @@ public final class Encoder implements Visitor {
   }
 
   @Override
-  public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
+  public Object visitPrivateDeclaration(PrivateDeclaration ast, Object o) {
+    Frame frame = (Frame) o;
+    int extraSize1 = (Integer) ast.PFD1.visit(this, frame);
+    Frame frameD2= new Frame(frame, extraSize1);
     
-      return null;
+    return (Integer) ast.PFD2.visit(this, frameD2) + extraSize1;
   }
 
   @Override
