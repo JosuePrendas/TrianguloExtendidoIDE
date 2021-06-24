@@ -146,7 +146,7 @@ public final class Encoder implements Visitor {
     ast.E.visit(this, frame);
     emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
     
-    return null;
+    return 0;
   }
 
   @Override
@@ -163,7 +163,7 @@ public final class Encoder implements Visitor {
     ast.E.visit(this, frame);
     emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
      
-        return null;
+    return 0;
   }
 
   @Override
