@@ -66,7 +66,7 @@ public class IDECompiler {
                 encoder.encodeRun(rootAST, false);
                 
                 if (report.numErrors == 0) {
-                 //   encoder.saveObjectProgram(sourceName.replace(".tri", ".tam")); //se descomento 
+                    encoder.saveObjectProgram(sourceName.replace(".tri", ".tam")); //se descomento 
                     success = true;
                 }
             }

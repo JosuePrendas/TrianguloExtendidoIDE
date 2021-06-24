@@ -618,7 +618,7 @@ public class Main extends javax.swing.JFrame {
                 output.setDelegate(delegateTAMCode);
                 disassembler.Disassemble(desktopPane.getSelectedFrame().getTitle().replace(".tri", ".tam")); //se descomento
                 ((FileFrame)desktopPane.getSelectedFrame()).setTree((DefaultMutableTreeNode)treeVisitor.visitProgram(compiler.getAST(), null));
-                ((FileFrame)desktopPane.getSelectedFrame()).setTable(tableVisitor.getTable(compiler.getAST())); //se descomento
+                //((FileFrame)desktopPane.getSelectedFrame()).setTable(tableVisitor.getTable(compiler.getAST())); //se descomento
                 
                 runMenuItem.setEnabled(false);
                 buttonRun.setEnabled(true);

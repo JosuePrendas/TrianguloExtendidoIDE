@@ -416,6 +416,8 @@ public class TreeVisitor implements Visitor {
      * @return The tree node.
      */
     public DefaultMutableTreeNode createBinary(String caption, AST child1, AST child2) {
+        //System.out.println(child1);
+        //System.out.println(child2);
         DefaultMutableTreeNode t = new DefaultMutableTreeNode(caption);
         t.add((DefaultMutableTreeNode)child1.visit(this, null));
         t.add((DefaultMutableTreeNode)child2.visit(this, null));
