@@ -641,81 +641,132 @@ public class TableVisitor implements Visitor {
 
     @Override
     public Object visitElsifCommand(ElsifCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.C1.visit(this, null);
+        ast.E.visit(this, null);
+        ast.EI.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitUntilCommand(UntilCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.C.visit(this, null);
+        ast.E.visit(this, null);
+      
+        return(null);
     }
 
     @Override
     public Object visitLoopWhileCommand(LoopWhileCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.W.visit(this, null);
+      
+        return(null);
     }
 
     @Override
     public Object visitLoopUntilCommand(LoopUntilCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.U.visit(this, null);
+      
+        return(null);
     }
 
     @Override
     public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.C1.visit(this, null);
+        ast.E.visit(this, null);
+      
+        return(null);
     }
 
     @Override
     public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.C1.visit(this, null);
+        ast.E.visit(this, null);
+      
+        return(null);
     }
 
     @Override
     public Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.W.visit(this, null);
+        ast.E1.visit(this, null);
+        ast.IE.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.U.visit(this, null);
+        ast.E1.visit(this, null);
+        ast.IE.visit(this, null);
+        
+        return(null);
     }
 
     @Override
-    public Object visitLoopCommandForDo(LoopCommandForDo loopCommandForDo, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object visitLoopCommandForDo(LoopCommandForDo ast, Object o) {
+        ast.C1.visit(this, null);
+        ast.E1.visit(this, null);
+        ast.IE.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.E.visit(this, null);
+        ast.I.visit(this, null);
+        
+        return(null);
     }
 
     @Override
-    public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object visitProcFuncDeclaration(ProcFuncDeclaration ast, Object o) {
+        ast.PFD1.visit(this, null);
+        ast.PFD2.visit(this, null);
+        
+        return(null);
     }
 
     @Override
-    public Object visitPrivateDeclaration(PrivateDeclaration privateDeclaration, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object visitPrivateDeclaration(PrivateDeclaration ast, Object o) {
+        ast.PFD1.visit(this, null);
+        ast.PFD2.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.I.visit(this, null);
+        ast.D.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.PDT1.visit(this, null);
+        ast.PDT2.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ast.L.visit(this, null);
+        
+        return(null);
     }
 
     @Override
     public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (ast.I1 != null)
+            ast.I1.visit(this, null);
+        ast.I2.visit(this, null);
+        
+        return(null);
     }
+    
 }
