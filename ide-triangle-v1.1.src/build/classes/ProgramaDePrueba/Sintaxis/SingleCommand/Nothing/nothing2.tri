@@ -1,4 +1,0 @@
-  
-! El objetivo de esta prueba es demostrar que se eliminó single-Command ::=
-! El diseño de la prueba será un programa en blanco.
-! Se espera que ocurra un error sintáctico que indique que “” no puede comenzar un comando.

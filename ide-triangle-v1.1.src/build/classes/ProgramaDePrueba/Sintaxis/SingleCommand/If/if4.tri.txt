@@ -1,9 +1,0 @@
-  
-! El objetivo de esta prueba es demostrar que se eliminó single-Command ::= “if” Expression “then” Command  “else” Command
-! El diseño de la prueba será un programa donde se siga la estructura de la regla de producción.
-! Se espera que ocurra un error de sintaxis que indique que se esperaba la palabra reservada ‘end’ al final del programa.
-
-if 1=1 then
-    puteol()
-else
-    puteol()

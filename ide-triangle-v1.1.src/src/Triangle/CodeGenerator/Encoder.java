@@ -18,12 +18,93 @@ import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import TAM.Instruction;
 import TAM.Machine;
-import Triangle.AbstractSyntaxTrees.*;
 import Triangle.ErrorReporter;
 import Triangle.StdEnvironment;
+import Triangle.AbstractSyntaxTrees.AST;
+import Triangle.AbstractSyntaxTrees.AnyTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ArrayExpression;
+import Triangle.AbstractSyntaxTrees.ArrayTypeDenoter;
+import Triangle.AbstractSyntaxTrees.AssignCommand;
+import Triangle.AbstractSyntaxTrees.BinaryExpression;
+import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
+import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
+import Triangle.AbstractSyntaxTrees.CallCommand;
+import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
+import Triangle.AbstractSyntaxTrees.CharacterExpression;
+import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.ConstActualParameter;
+import Triangle.AbstractSyntaxTrees.ConstDeclaration;
+import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
+import Triangle.AbstractSyntaxTrees.Declaration;
+import Triangle.AbstractSyntaxTrees.DotVname;
+import Triangle.AbstractSyntaxTrees.ElsifCommand;
+import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
+import Triangle.AbstractSyntaxTrees.EmptyCommand;
+import Triangle.AbstractSyntaxTrees.EmptyExpression;
+import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
+import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
+import Triangle.AbstractSyntaxTrees.FuncActualParameter;
+import Triangle.AbstractSyntaxTrees.FuncDeclaration;
+import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.Identifier;
+import Triangle.AbstractSyntaxTrees.IdentifierExpresionTree;
+import Triangle.AbstractSyntaxTrees.IfCommand;
+import Triangle.AbstractSyntaxTrees.IfExpression;
+import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
+import Triangle.AbstractSyntaxTrees.IntegerExpression;
+import Triangle.AbstractSyntaxTrees.IntegerLiteral;
+import Triangle.AbstractSyntaxTrees.LetCommand;
+import Triangle.AbstractSyntaxTrees.LetExpression;
+import Triangle.AbstractSyntaxTrees.LongIdentifier;
+import Triangle.AbstractSyntaxTrees.LongIdentifierTypeDenoter;
+import Triangle.AbstractSyntaxTrees.LoopCommandForDo;
+import Triangle.AbstractSyntaxTrees.LoopCommandForUntil;
+import Triangle.AbstractSyntaxTrees.LoopCommandForWhile;
+import Triangle.AbstractSyntaxTrees.LoopDoUntilCommand;
+import Triangle.AbstractSyntaxTrees.LoopDoWhileCommand;
+import Triangle.AbstractSyntaxTrees.LoopUntilCommand;
+import Triangle.AbstractSyntaxTrees.LoopWhileCommand;
+import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
+import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
+import Triangle.AbstractSyntaxTrees.MultipleFieldTypeDenoter;
+import Triangle.AbstractSyntaxTrees.MultipleFormalParameterSequence;
+import Triangle.AbstractSyntaxTrees.MultipleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.Operator;
+import Triangle.AbstractSyntaxTrees.PackageDeclaration;
+import Triangle.AbstractSyntaxTrees.PackageDeclarationTree;
+import Triangle.AbstractSyntaxTrees.PrivateDeclaration;
+import Triangle.AbstractSyntaxTrees.ProcActualParameter;
+import Triangle.AbstractSyntaxTrees.ProcDeclaration;
+import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.ProcFuncDeclaration;
+import Triangle.AbstractSyntaxTrees.Program;
+import Triangle.AbstractSyntaxTrees.RecordExpression;
+import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SequentialCommand;
+import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SimpleVname;
+import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
+import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
+import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
+import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.SubscriptVname;
+import Triangle.AbstractSyntaxTrees.TypeDeclaration;
+import Triangle.AbstractSyntaxTrees.UnaryExpression;
+import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
+import Triangle.AbstractSyntaxTrees.UntilCommand;
+import Triangle.AbstractSyntaxTrees.VarActualParameter;
+import Triangle.AbstractSyntaxTrees.VarDeclaration;
+import Triangle.AbstractSyntaxTrees.VarFormalParameter;
+import Triangle.AbstractSyntaxTrees.Visitor;
+import Triangle.AbstractSyntaxTrees.Vname;
+import Triangle.AbstractSyntaxTrees.VnameExpression;
+import Triangle.AbstractSyntaxTrees.WhileCommand;
 
 public final class Encoder implements Visitor {
 
@@ -57,15 +138,16 @@ public final class Encoder implements Visitor {
     emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, 0);
     ast.C1.visit(this, frame);
     jumpAddr = nextInstrAddr;
+    ArrayList<Integer> jumpAddrs = new ArrayList<>();
+    jumpAddrs.add(jumpAddr);
     emit(Machine.JUMPop, 0, Machine.CBr, 0);
     patch(jumpifAddr, nextInstrAddr);
+    if(ast.EI!=null)
+        jumpAddrs.addAll((ArrayList<Integer>) ast.EI.visit(this,frame));
     ast.C2.visit(this, frame);
-    patch(jumpAddr, nextInstrAddr);
-    return null;
-  }
-
-  @Override
-  public Object visitElsifCommand(ElsifCommand ast, Object o) {
+    for(int jumpAddress : jumpAddrs){
+        patch(jumpAddress, nextInstrAddr);
+    }
     return null;
   }
 
@@ -96,166 +178,6 @@ public final class Encoder implements Visitor {
     ast.E.visit(this, frame);
     emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
     return null;
-  }
-
-  @Override
-  public Object visitUntilCommand(UntilCommand ast, Object o) {
-    //Agregado 
-    Frame frame = (Frame) o;
-    int jumpAddr, loopAddr;
-
-    jumpAddr = nextInstrAddr;
-    emit(Machine.JUMPop, 0, Machine.CBr, 0);
-    loopAddr = nextInstrAddr;
-    ast.C.visit(this, frame);
-    patch(jumpAddr, nextInstrAddr);
-    ast.E.visit(this, frame);
-    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
-     
-    return null;  
-  }
-
-  @Override
-  public Object visitLoopWhileCommand(LoopWhileCommand loopWhileCommand, Object o) {
-    //Agregado
-    Frame frame = (Frame) o;
-    loopWhileCommand.W.visit(this, frame);  
-    
-    return null;
-  }
-
-  @Override
-  public Object visitLoopUntilCommand(LoopUntilCommand loopUntilCommand, Object o) {
-    //Agregado
-    Frame frame = (Frame) o;
-    loopUntilCommand.U.visit(this, frame);    
-    
-    return null;
-  }
-
-  @Override
-  public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
-    Frame frame = (Frame) o;
-    int jumpAddr, loopAddr;
-
-    jumpAddr = nextInstrAddr;
-    emit(Machine.JUMPop, 0, Machine.CBr, 0);
-    loopAddr = nextInstrAddr;
-    ast.C1.visit(this, frame);
-    patch(jumpAddr, nextInstrAddr);
-    ast.E.visit(this, frame);
-    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
-    
-    return 0;
-  }
-
-  @Override
-  public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
-    //Agregado
-    Frame frame = (Frame) o;
-    int jumpAddr, loopAddr;
-
-    jumpAddr = nextInstrAddr;
-    emit(Machine.JUMPop, 0, Machine.CBr, 0);
-    loopAddr = nextInstrAddr;
-    ast.C1.visit(this, frame);
-    patch(jumpAddr, nextInstrAddr);
-    ast.E.visit(this, frame);
-    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
-     
-    return 0;
-  }
-
-  @Override
-  public Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o) {
-    //Agregado
-    
-    Frame frame = (Frame) o;
-    int loopAddr, jumpComp, varForControl, extraSize1, extraSize2;
-
-    extraSize1 = (Integer) ast.IE.E.visit(this, frame);
-    Frame frame1 = new Frame (frame, extraSize1);
-    varForControl = nextInstrAddr;
-
-    extraSize2 = (Integer) ast.E1.visit(this, frame1);
-    jumpComp = nextInstrAddr;
-
-    Frame frame2 = new Frame (frame, extraSize2 + extraSize1);
-    loopAddr = nextInstrAddr;
-    
-  
-    ast.W.visit(this, frame2);
-    
-    emit(Machine.CALLop, varForControl, Machine.PBr, Machine.succDisplacement);
-    patch(jumpComp, nextInstrAddr);
-
-    emit(Machine.LOADop, extraSize1 + extraSize2, Machine.STr, -2);
-    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
-    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
-    emit(Machine.POPop, 0, 0, extraSize1 + extraSize2);
-    
-    return 0;
-  }
-
-  @Override
-  public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
-    //Agregado
-    
-    Frame frame = (Frame) o;
-    int loopAddr, jumpComp, varForControl, extraSize1, extraSize2;
-
-    extraSize1 = (Integer) ast.IE.E.visit(this, frame);
-    Frame frame1 = new Frame (frame, extraSize1);
-    varForControl = nextInstrAddr;
-
-    extraSize2 = (Integer) ast.E1.visit(this, frame1);
-    jumpComp = nextInstrAddr;
-
-    Frame frame2 = new Frame (frame, extraSize2 + extraSize1);
-    loopAddr = nextInstrAddr;
-    
-  
-    ast.U.visit(this, frame2);
-    
-    emit(Machine.CALLop, varForControl, Machine.PBr, Machine.succDisplacement);
-    patch(jumpComp, nextInstrAddr);
-
-    emit(Machine.LOADop, extraSize1 + extraSize2, Machine.STr, -2);
-    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
-    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
-    emit(Machine.POPop, 0, 0, extraSize1 + extraSize2);
-    
-    return 0;
-  }
-
-  @Override
-  public Object visitLoopCommandForDo(LoopCommandForDo ast, Object o) {
-    //Agregado
-    
-    Frame frame = (Frame) o;
-    int loopAddr, jumpComp, varForControl, extraSize1, extraSize2;
-
-    extraSize1 = (Integer) ast.IE.E.visit(this, frame);
-    Frame frame1 = new Frame (frame, extraSize1);
-    varForControl = nextInstrAddr;
-
-    extraSize2 = (Integer) ast.E1.visit(this, frame1);
-    jumpComp = nextInstrAddr;
-
-    Frame frame2 = new Frame (frame, extraSize2 + extraSize1);
-    loopAddr = nextInstrAddr;
-    
-  
-    ast.C1.visit(this, frame2);
-    emit(Machine.CALLop, varForControl, Machine.PBr, Machine.succDisplacement);
-    patch(jumpComp, nextInstrAddr);
-
-    emit(Machine.LOADop, extraSize1 + extraSize2, Machine.STr, -2);
-    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
-    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
-    emit(Machine.POPop, 0, 0, extraSize1 + extraSize2);
-
-  return 0;
   }
 
 
@@ -352,11 +274,6 @@ public final class Encoder implements Visitor {
     return valSize;
   }
 
-  @Override
-  public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
-    return null;
-  }
-
 
   // Declarations
   public Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast,
@@ -451,40 +368,18 @@ public final class Encoder implements Visitor {
 
   public Object visitVarDeclaration(VarDeclaration ast, Object o) {
     Frame frame = (Frame) o;
-    int extraSize;
-
+    int extraSize = 0;
     extraSize = ((Integer) ast.T.visit(this, null)).intValue();
     emit(Machine.PUSHop, 0, 0, extraSize);
     ast.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
+    if(ast.E != null){
+        ObjectAddress address = ((KnownAddress) ast.entity).address;
+        int valSize = ((Integer) ast.E.visit(this, frame)).intValue();
+        emit(Machine.STOREop, valSize, displayRegister(frame.level,
+	     address.level), address.displacement);
+    }
     writeTableDetails(ast);
     return new Integer(extraSize);
-    
-  }
-
-  @Override
-  public Object visitProcFuncDeclaration(ProcFuncDeclaration procFuncDeclaration, Object o) {
-      
-      
-    return null;
-  }
-
-  @Override
-  public Object visitPrivateDeclaration(PrivateDeclaration ast, Object o) {
-    Frame frame = (Frame) o;
-    int extraSize1 = (Integer) ast.PFD1.visit(this, frame);
-    Frame frameD2= new Frame(frame, extraSize1);
-    
-    return (Integer) ast.PFD2.visit(this, frameD2) + extraSize1;
-  }
-
-  @Override
-  public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
-    return null;
-  }
-
-  @Override
-  public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) {
-    return null;
   }
 
 
@@ -684,16 +579,6 @@ public final class Encoder implements Visitor {
     return new Integer(0);
   }
 
-  @Override
-  public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
-    return null;
-  }
-
-  public Object visitSimpleTypeDenoter(LongIdentifierTypeDenoter ast,
-                                       Object o) {
-    return new Integer(0);
-  }
-
   public Object visitIntTypeDenoter(IntTypeDenoter ast, Object o) {
     if (ast.entity == null) {
       ast.entity = new TypeRepresentation(Machine.integerSize);
@@ -802,11 +687,6 @@ public final class Encoder implements Visitor {
     return null;
   }
 
-  @Override
-  public Object visitLongIdentifier(LongIdentifier ast, Object o) {
-    return null;
-  }
-
 
   // Value-or-variable names
   public Object visitDotVname(DotVname ast, Object o) {
@@ -821,8 +701,7 @@ public final class Encoder implements Visitor {
   public Object visitSimpleVname(SimpleVname ast, Object o) {
     ast.offset = 0;
     ast.indexed = false;
-    //return ast.I.decl.entity;
-    return null;
+    return ast.I.I2.decl.entity;
   }
 
   public Object visitSubscriptVname(SubscriptVname ast, Object o) {
@@ -858,7 +737,10 @@ public final class Encoder implements Visitor {
 
   // Programs
   public Object visitProgram(Program ast, Object o) {
-    return ast.C.visit(this, o);
+    Frame frame = (Frame) o;
+    if(ast.PDT != null)
+        ast.PDT.visit(this,o);
+    return ast.C.visit(this, new Frame(frame.level+1,Machine.linkDataSize));
   }
 
   public Encoder (ErrorReporter reporter) {
@@ -1139,7 +1021,285 @@ public final class Encoder implements Visitor {
     }
   }
 
+    @Override
+    public Object visitElsifCommand(ElsifCommand ast, Object o) {
+        Frame frame = (Frame) o;
+        ArrayList<Integer> jumpAddrs = new ArrayList<Integer>();
+        if(ast.EI!=null)
+            jumpAddrs.addAll((ArrayList<Integer>)ast.EI.visit(this,frame));
+        int jumpifAddr, jumpAddr;
+        Integer valSize = (Integer) ast.E.visit(this, frame);
+        jumpifAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, 0);
+        ast.C1.visit(this, frame);
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpifAddr, nextInstrAddr);
+        jumpAddrs.add(jumpAddr);
+        return jumpAddrs;
+    }
 
+    @Override
+    public Object visitUntilCommand(UntilCommand ast, Object o) {
+        Frame frame = (Frame) o;
+        int jumpAddr, loopAddr;
 
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        loopAddr = nextInstrAddr;
+        ast.C.visit(this, frame);
+        patch(jumpAddr, nextInstrAddr);
+        ast.E.visit(this, frame);
+        emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, loopAddr);
+        return null;
+    }
 
+    @Override
+    public Object visitLoopWhileCommand(LoopWhileCommand ast, Object o) {
+        Frame frame = (Frame) o;
+        ast.W.visit(this, frame);  
+        return null;
+    }
+
+    @Override
+    public Object visitLoopUntilCommand(LoopUntilCommand ast, Object o) {
+        Frame frame = (Frame) o;
+        ast.U.visit(this, frame);    
+        return null;
+    }
+
+    @Override
+    public Object visitLoopDoUntilCommand(LoopDoUntilCommand ast, Object o) {
+        Frame frame = (Frame) o;
+        int jumpAddr, loopAddr;
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        loopAddr = nextInstrAddr;
+        ast.C1.visit(this, frame);
+        patch(jumpAddr, nextInstrAddr);
+        ast.E.visit(this, frame);
+        emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, loopAddr);
+        return 0;
+    }
+
+    @Override
+    public Object visitLoopDoWhileCommand(LoopDoWhileCommand ast, Object o) {
+        Frame frame = (Frame) o;
+        int jumpAddr, loopAddr;
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        loopAddr = nextInstrAddr;
+        ast.C1.visit(this, frame);
+        patch(jumpAddr, nextInstrAddr);
+        ast.E.visit(this, frame);
+        emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+        return 0;
+    }
+
+    @Override
+    public Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o) {
+        Frame frame = (Frame) o;
+        int loopAddr, jumpAddr, jumpComp, varForControl, extraSize1, extraSize2;
+
+        extraSize1 = ((Integer) ast.IE.visit(this,frame)).intValue();
+        Frame frame1 = new Frame (frame, extraSize1);
+        
+        IntegerExpression intE = new IntegerExpression(new IntegerLiteral("1", ast.position), ast.position);
+        intE.type = StdEnvironment.integerType;
+        
+        Operator addOp = new Operator("+", ast.position);
+        addOp.decl = StdEnvironment.addDecl;
+        
+        Operator leOp = new Operator("<=", ast.position);
+        leOp.decl = StdEnvironment.notgreaterDecl;
+        
+        Operator andOp = new Operator("/\\", ast.position);
+        andOp.decl = StdEnvironment.andDecl;
+        
+        SimpleVname controlVarVname = new SimpleVname(new LongIdentifier(ast.IE.I,ast.position), ast.position);
+        VnameExpression controlVarVnameExpression = new VnameExpression(controlVarVname, ast.position);
+        controlVarVnameExpression.type = StdEnvironment.integerType;
+        BinaryExpression secondWhileCondition = new BinaryExpression(controlVarVnameExpression, leOp, ast.E1, ast.position);
+        secondWhileCondition.type = StdEnvironment.integerType;
+        BinaryExpression whileCondition = new BinaryExpression(secondWhileCondition, andOp, ast.W.E, ast.position);
+        whileCondition.type = StdEnvironment.integerType;
+        BinaryExpression controlVarInc = new BinaryExpression(controlVarVnameExpression, addOp, intE, ast.position);
+        controlVarInc.type = StdEnvironment.integerType;
+      
+        new WhileCommand(whileCondition, new SequentialCommand(ast.W.C, new AssignCommand(controlVarVname, controlVarInc, ast.position), ast.position),ast.position).visit(this, frame1);
+
+        return 0;
+    }
+
+    @Override
+    public Object visitLoopCommandForUntil(LoopCommandForUntil ast, Object o) {
+        Frame frame = (Frame) o;
+        int loopAddr, jumpAddr, jumpComp, varForControl, extraSize1, extraSize2;
+
+        extraSize1 = ((Integer) ast.IE.visit(this,frame)).intValue();
+        Frame frame1 = new Frame (frame, extraSize1);
+        
+        IntegerExpression intE = new IntegerExpression(new IntegerLiteral("1", ast.position), ast.position);
+        intE.type = StdEnvironment.integerType;
+        
+        Operator addOp = new Operator("+", ast.position);
+        addOp.decl = StdEnvironment.addDecl;
+        
+        Operator leOp = new Operator("<=", ast.position);
+        leOp.decl = StdEnvironment.notgreaterDecl;
+        
+        Operator andOp = new Operator("/\\", ast.position);
+        andOp.decl = StdEnvironment.andDecl;
+        
+        Operator notOp = new Operator("\\",ast.position);
+        notOp.decl = StdEnvironment.notDecl;
+        
+        SimpleVname controlVarVname = new SimpleVname(new LongIdentifier(ast.IE.I,ast.position), ast.position);
+        VnameExpression controlVarVnameExpression = new VnameExpression(controlVarVname, ast.position);
+        controlVarVnameExpression.type = StdEnvironment.integerType;
+        BinaryExpression secondWhileCondition = new BinaryExpression(controlVarVnameExpression, leOp, ast.E1, ast.position);
+        secondWhileCondition.type = StdEnvironment.integerType;
+        UnaryExpression firstWhileCondition = new UnaryExpression(notOp, ast.U.E, ast.position);
+        firstWhileCondition.type = StdEnvironment.booleanType;
+        BinaryExpression whileCondition = new BinaryExpression(secondWhileCondition, andOp, firstWhileCondition, ast.position);
+        whileCondition.type = StdEnvironment.integerType;
+        BinaryExpression controlVarInc = new BinaryExpression(controlVarVnameExpression, addOp, intE, ast.position);
+        controlVarInc.type = StdEnvironment.integerType;
+      
+        new WhileCommand(whileCondition, new SequentialCommand(ast.U.C, new AssignCommand(controlVarVname, controlVarInc, ast.position), ast.position),ast.position).visit(this, frame1);
+        
+        return 0;
+    }
+
+    @Override
+    public Object visitLoopCommandForDo(LoopCommandForDo ast, Object o) {
+        //while
+        Frame frame = (Frame) o;
+        int jumpAddr, loopAddr, extraSize1;
+        //control var init
+        extraSize1 = ((Integer) ast.IE.visit(this,frame)).intValue();
+        Frame frame1 = new Frame (frame, extraSize1);
+        Integer valSize = new Integer(Machine.integerSize);
+
+        //while
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        loopAddr = nextInstrAddr;
+        //start commands
+
+        ast.C1.visit(this, frame1);
+        //assign command
+        //binary expression
+        //Vname Expression
+        ObjectAddress address = ((KnownAddress) ast.IE.I.decl.entity).address;
+        emit(Machine.LOADop, valSize, displayRegister(frame1.level, address.level), address.displacement);
+        //Integer expression
+        emit(Machine.LOADLop, 0, 0, 1);
+        //operator
+        int displacement = ((PrimitiveRoutine) StdEnvironment.addDecl.entity).displacement;
+        if (displacement != Machine.idDisplacement)
+            emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement);
+
+        //simple vname
+        emit(Machine.STOREop, valSize, displayRegister(new Frame(frame1,valSize.intValue()).level,address.level), address.displacement);
+
+        patch(jumpAddr, nextInstrAddr);
+        //end commands
+
+        //while expression condition
+        //binary expression
+        //Vname Expression
+        emit(Machine.LOADop, valSize, displayRegister(frame1.level, address.level), address.displacement);
+        //expression
+        Frame frame2 = new Frame(frame1, valSize);
+        ast.E1.visit(this, frame2);
+        //operator
+        int displacement2 = ((PrimitiveRoutine) StdEnvironment.notgreaterDecl.entity).displacement;
+        if (displacement2 != Machine.idDisplacement)
+            emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement2);
+        //while condition end
+        emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+        return 0;
+    }
+
+    @Override
+    public Object visitIdentifierExpresionTree(IdentifierExpresionTree ast, Object o) {
+        return ast.I.decl.visit(this,o);
+    }
+
+    @Override
+    public Object visitProcFuncDeclaration(ProcFuncDeclaration ast, Object o) {
+        Frame frame = (Frame) o;
+        int jumpAddr = nextInstrAddr;
+        int argsSize = 0, valSize = 0;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        //se genera el codigo de la declaracion de los procs o funcs
+        ast.PFD2.entity = new KnownRoutine (Machine.closureSize, frame.level, nextInstrAddr);
+        writeTableDetails(ast.PFD2);
+        ast.PFD1.visit(this, frame);
+        //se genera el codigo del cuerpo de los procs o funcs
+        if(ast.PFD2 instanceof ProcDeclaration){
+            ProcDeclaration procDec = (ProcDeclaration) ast.PFD2;
+            if (frame.level == Machine.maxRoutineLevel)
+              reporter.reportRestriction("can't nest routines so deeply");
+            else {
+              Frame frame1 = new Frame(frame.level + 1, 0);
+              argsSize = ((Integer) procDec.FPS.visit(this, frame1)).intValue();
+              Frame frame2 = new Frame(frame.level + 1, Machine.linkDataSize);
+              procDec.C.visit(this, frame2);
+            }
+        }
+        else{
+            FuncDeclaration funcDec = (FuncDeclaration) ast.PFD2;
+            if (frame.level == Machine.maxRoutineLevel)
+              reporter.reportRestriction("can't nest routines more than 7 deep");
+            else {
+              Frame frame1 = new Frame(frame.level + 1, 0);
+              argsSize = ((Integer) funcDec.FPS.visit(this, frame1)).intValue();
+              Frame frame2 = new Frame(frame.level + 1, Machine.linkDataSize);
+              valSize = ((Integer) funcDec.E.visit(this, frame2)).intValue();
+            }
+        }
+        emit(Machine.RETURNop, valSize, 0, argsSize);
+        patch(jumpAddr, nextInstrAddr);
+        return new Integer(0);
+    }
+
+    @Override
+    public Object visitPrivateDeclaration(PrivateDeclaration ast, Object o) {
+        Frame frame = (Frame) o;
+        int extraSize1 = (Integer) ast.PFD1.visit(this, frame);
+        Frame frameD2= new Frame(frame, extraSize1);
+
+        return (Integer) ast.PFD2.visit(this, frameD2) + extraSize1;
+    }
+
+    @Override
+    public Object visitPackageDeclaration(PackageDeclaration ast, Object o) {
+      Frame frame = (Frame) o;
+      return ((Integer) ast.D.visit(this, frame)).intValue();
+    }
+
+    @Override
+    public Object visitPackageDeclarationTree(PackageDeclarationTree ast, Object o) { 
+        Frame frame = (Frame) o;
+        int extraSize = 0;
+        if(ast.PDT1 instanceof PackageDeclaration)
+            extraSize = (Integer) ast.PDT1.visit(this, frame);
+        Frame frame1 = new Frame(frame.level, extraSize);
+        ast.PDT2.visit(this, frame1);
+        return null; 
+    }
+
+    @Override
+    public Object visitLongIdentifierTypeDenoter(LongIdentifierTypeDenoter ast, Object o) {
+        ast.L.visit(this,o);
+        return new Integer(0);
+    }
+
+    @Override
+    public Object visitLongIdentifier(LongIdentifier ast, Object o) {
+        ast.I2.visit(this, o);
+        return null;
+    }
 }

@@ -1,6 +1,0 @@
-! El objetivo de esta prueba es demostrar que el analizador léxico y el analizador sintáctico ya no reconocen el token 'begin'.
-! El diseño de la prueba será un programa que solo constará de la palabra reservada 'begin'.
-! Se espera que ocurra un error sintáctico informando que se esperaba un '(', esto haciendo referencia a que begin se está tomando
-! como un identificador, de forma que ya no se reconoce como palabra reservada del lenguaje
-
-begin

@@ -320,8 +320,10 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
     //revisar esta parte
-    Declaration controlVariable = new ConstDeclaration(ast.I, ast.E, ast.position);
+    VarDeclaration controlVariable = new VarDeclaration(ast.I, ast.E,true, ast.position);
     controlVariable.visit(this, null);
+    ast.I.decl = controlVariable;
+    ast.I.type = controlVariable.T;
     return null;
   }
 
@@ -860,7 +862,10 @@ public final class Checker implements Visitor {
         ast.variable = false;
       } else if (binding instanceof VarDeclaration) {
         ast.type = ((VarDeclaration) binding).T;
-        ast.variable = true;
+        if(((VarDeclaration) binding).isInForLoop)
+            ast.variable = false;
+        else
+            ast.variable = true;
       } else if (binding instanceof ConstFormalParameter) {
         ast.type = ((ConstFormalParameter) binding).T;
         ast.variable = false;

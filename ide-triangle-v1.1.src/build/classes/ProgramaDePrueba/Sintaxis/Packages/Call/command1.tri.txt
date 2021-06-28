@@ -1,6 +1,0 @@
-! El objetivo de esta prueba es demostrar que se agregó singleCommand ::= Long-Identifier “(“ Actual-Parameter-Sequence “)”.
-! El diseño de la prueba será un programa que realiza un CallCommand de una función o procedimiento de un package.
-! Se espera que no ocurra ningún error sintáctico, y que genere un CallCommand con un LongIdentifier que contiene dos Identifier.
-! El resultado obtenido fue: Compilation was successful.
-
-triangle$callcommand()

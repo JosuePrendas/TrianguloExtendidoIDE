@@ -17,6 +17,7 @@ public class PackagesIdentificationTable {
     private HashMap<String,IdentificationTable> packagesIdTable;
     private IdentificationTable currentIdTable;
     private boolean packageDeclarationPhase;
+    private IdentificationTable oldTable;
     
     public PackagesIdentificationTable() {
         packagesIdTable = new HashMap<>();
@@ -68,12 +69,16 @@ public class PackagesIdentificationTable {
     
     //se abre un paquete tanto para meter declaraciones como para buscarlas
     public void openPackage(String id){
+        oldTable = currentIdTable;
         currentIdTable = packagesIdTable.get(id);
     }
     
     //se cierra el paquete, se vuelve a la tabla default
     public void closePackage(){
-        currentIdTable = packagesIdTable.get(null);
+        if(currentIdTable == oldTable)
+           currentIdTable = packagesIdTable.get(null);
+        else
+            currentIdTable = oldTable;
     }
     
     //en caso de que se este en private scope, las declaraciones ingresadas son privadas
@@ -90,8 +95,12 @@ public class PackagesIdentificationTable {
         Declaration value = null;
         if(value == null)
             value = currentIdTable.retrieve(id);
-        if(value == null && packageDeclarationPhase)
-            return packagesIdTable.get(null).retrieve(id);
+        if(value == null && packageDeclarationPhase){
+            value = oldTable.retrieve(id);
+            if(value == null)
+                return packagesIdTable.get(null).retrieve(id);
+            return value;
+        }
         return value;
     }
     

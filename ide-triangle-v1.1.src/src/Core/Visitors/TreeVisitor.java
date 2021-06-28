@@ -214,7 +214,10 @@ public class TreeVisitor implements Visitor {
     }
     
     public Object visitVarDeclaration(VarDeclaration ast, Object obj) {
-        return(createBinary("Variable Declaration", ast.I, ast.T));
+        if(ast.E == null)
+            return(createBinary("Variable Declaration", ast.I, ast.T));
+        else
+            return(createTernary("Variable Declaration", ast.I, ast.T, ast.E));
     }
     /*
     public Object visitVarDeclaration(VarDeclaration ast, Object obj) {

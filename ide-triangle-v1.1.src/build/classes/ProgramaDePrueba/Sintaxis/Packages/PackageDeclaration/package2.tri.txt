@@ -1,9 +1,0 @@
-! El objetivo de esta prueba es demostrar que se agregaron Package-Declaration ::= “package” Identifier “~” Declaration “end”
-! y Program ::= (Package-Declaration “;”)* Command.
-! El diseño de la prueba será un programa que contiene dos PackageDeclaration seguido de un Command seguido de otro PackageDeclaration.
-! Se espera que ocurra un error sintáctico referente a que no pueden haber PackageDeclarations después de un Command.
-
-package util ~ var bool := true end;
-package util2 ~ var bool2 := true end;
-nothing
-package util3 ~ var bool3 := false end;

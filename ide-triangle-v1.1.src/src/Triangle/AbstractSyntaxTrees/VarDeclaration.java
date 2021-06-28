@@ -22,12 +22,21 @@ public class VarDeclaration extends Declaration {
     super (thePosition);
     I = iAST;
     T = tAST;
+    isInForLoop = false;
   }
 
   public VarDeclaration (Identifier iAST, Expression eAST, SourcePosition thePosition) {
     super (thePosition);
     I = iAST;
     E = eAST;
+    isInForLoop = false;
+  }
+  
+  public VarDeclaration (Identifier iAST, Expression eAST, boolean inLoop ,SourcePosition thePosition) {
+    super (thePosition);
+    I = iAST;
+    E = eAST;
+    isInForLoop = inLoop;
   }
 
   public Object visit(Visitor v, Object o) {
@@ -37,4 +46,5 @@ public class VarDeclaration extends Declaration {
   public Identifier I;
   public TypeDenoter T;
   public Expression E;
+  public boolean isInForLoop;
 }

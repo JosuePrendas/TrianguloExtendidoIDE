@@ -1,7 +1,0 @@
-! El objetivo de esta prueba es demostrar que se agregó primary-Expression ::= Long-Identifier “(“ Actual-Parameter-Sequence “)”.
-! El diseño de la prueba será un programa que realiza un CallExpression de una función o procedimiento, dentro de un loop for.
-! Se espera que no ocurra ningún error sintáctico, y que genere un CallExpression con un LongIdentifier que contiene un solo Identifier.
-
-loop for x from 0 to getE() do
-    nothing
-end
