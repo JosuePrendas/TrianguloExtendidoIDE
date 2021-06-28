@@ -1171,6 +1171,7 @@ public final class Encoder implements Visitor {
 
         //while condition end
         emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+        emit(Machine.POPop, 0, 0, valSize);
         return 0;
     }
 
@@ -1255,6 +1256,7 @@ public final class Encoder implements Visitor {
 
         //while condition end
         emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+        emit(Machine.POPop, 0, 0, valSize);
         return 0;
     }
 
@@ -1321,6 +1323,7 @@ public final class Encoder implements Visitor {
             emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement2);
         //while condition end
         emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+        emit(Machine.POPop, 0, 0, valSize);
         return 0;
     }
 
