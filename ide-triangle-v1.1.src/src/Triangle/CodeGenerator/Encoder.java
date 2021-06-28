@@ -738,9 +738,10 @@ public final class Encoder implements Visitor {
   // Programs
   public Object visitProgram(Program ast, Object o) {
     Frame frame = (Frame) o;
+    int extraSize = 0;
     if(ast.PDT != null)
-        ast.PDT.visit(this,o);
-    return ast.C.visit(this, new Frame(frame.level+1,Machine.linkDataSize));
+        extraSize = (Integer) ast.PDT.visit(this,o);
+    return ast.C.visit(this, new Frame(frame.level + 1, extraSize));
   }
 
   public Encoder (ErrorReporter reporter) {
@@ -1180,6 +1181,12 @@ public final class Encoder implements Visitor {
         extraSize1 = ((Integer) ast.IE.visit(this,frame)).intValue();
         Frame frame1 = new Frame (frame, extraSize1);
         Integer valSize = new Integer(Machine.integerSize);
+        
+        //const e2 init
+        ConstDeclaration constDec = new ConstDeclaration(new Identifier("xd", ast.position), ast.E1, ast.position);
+        constDec.visit(this, frame1);
+        
+        Frame frame2 = new Frame(frame, valSize);
 
         //while
         jumpAddr = nextInstrAddr;
@@ -1187,12 +1194,12 @@ public final class Encoder implements Visitor {
         loopAddr = nextInstrAddr;
         //start commands
 
-        ast.C1.visit(this, frame1);
+        ast.C1.visit(this, frame2);
         //assign command
         //binary expression
         //Vname Expression
         ObjectAddress address = ((KnownAddress) ast.IE.I.decl.entity).address;
-        emit(Machine.LOADop, valSize, displayRegister(frame1.level, address.level), address.displacement);
+        emit(Machine.LOADop, valSize, displayRegister(frame2.level, address.level), address.displacement);
         //Integer expression
         emit(Machine.LOADLop, 0, 0, 1);
         //operator
@@ -1201,7 +1208,7 @@ public final class Encoder implements Visitor {
             emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement);
 
         //simple vname
-        emit(Machine.STOREop, valSize, displayRegister(new Frame(frame1,valSize.intValue()).level,address.level), address.displacement);
+        emit(Machine.STOREop, valSize, displayRegister(new Frame(frame2,valSize.intValue()).level,address.level), address.displacement);
 
         patch(jumpAddr, nextInstrAddr);
         //end commands
@@ -1211,8 +1218,20 @@ public final class Encoder implements Visitor {
         //Vname Expression
         emit(Machine.LOADop, valSize, displayRegister(frame1.level, address.level), address.displacement);
         //expression
-        Frame frame2 = new Frame(frame1, valSize);
-        ast.E1.visit(this, frame2);
+        Frame frame3 = new Frame(frame2, valSize);
+        
+        //ast.E1.visit(this, frame3);
+        if (constDec.entity instanceof KnownValue) {
+            // presumably offset = 0 and indexed = false
+            int value = ((KnownValue) constDec.entity).value;
+            emit(Machine.LOADLop, 0, 0, value);
+        }
+        else{
+            ObjectAddress constAddress = ((UnknownValue) constDec.entity).address;
+            emit(Machine.LOADop, valSize, displayRegister(frame3.level, constAddress.level), constAddress.displacement);
+        }
+        
+        
         //operator
         int displacement2 = ((PrimitiveRoutine) StdEnvironment.notgreaterDecl.entity).displacement;
         if (displacement2 != Machine.idDisplacement)
@@ -1287,8 +1306,7 @@ public final class Encoder implements Visitor {
         if(ast.PDT1 instanceof PackageDeclaration)
             extraSize = (Integer) ast.PDT1.visit(this, frame);
         Frame frame1 = new Frame(frame.level, extraSize);
-        ast.PDT2.visit(this, frame1);
-        return null; 
+        return ((Integer) ast.PDT2.visit(this, frame1)).intValue() + extraSize;
     }
 
     @Override
