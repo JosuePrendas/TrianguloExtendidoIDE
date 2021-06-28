@@ -131,6 +131,8 @@ public class TableVisitor implements Visitor {
   public Object visitIfCommand(IfCommand ast, Object o) { 
       ast.E.visit(this, null);
       ast.C1.visit(this, null);
+      if(ast.EI != null)
+        ast.EI.visit(this,null);
       ast.C2.visit(this, null);
       
       return(null);
@@ -641,9 +643,10 @@ public class TableVisitor implements Visitor {
 
     @Override
     public Object visitElsifCommand(ElsifCommand ast, Object o) {
-        ast.C1.visit(this, null);
+        if(ast.EI!=null)
+            ast.EI.visit(this, null);
         ast.E.visit(this, null);
-        ast.EI.visit(this, null);
+        ast.C1.visit(this, null);
         
         return(null);
     }
