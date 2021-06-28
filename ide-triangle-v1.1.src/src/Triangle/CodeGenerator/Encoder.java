@@ -284,7 +284,6 @@ public final class Encoder implements Visitor {
   public Object visitConstDeclaration(ConstDeclaration ast, Object o) {
     Frame frame = (Frame) o;
     int extraSize = 0;
-
     if (ast.E instanceof CharacterExpression) {
         CharacterLiteral CL = ((CharacterExpression) ast.E).CL;
         ast.entity = new KnownValue(Machine.characterSize,
@@ -1099,36 +1098,79 @@ public final class Encoder implements Visitor {
 
     @Override
     public Object visitLoopCommandForWhile(LoopCommandForWhile ast, Object o) {
+        //while
         Frame frame = (Frame) o;
-        int loopAddr, jumpAddr, jumpComp, varForControl, extraSize1, extraSize2;
-
+        int jumpAddr, loopAddr, extraSize1;
+        //control var init
         extraSize1 = ((Integer) ast.IE.visit(this,frame)).intValue();
         Frame frame1 = new Frame (frame, extraSize1);
-        
-        IntegerExpression intE = new IntegerExpression(new IntegerLiteral("1", ast.position), ast.position);
-        intE.type = StdEnvironment.integerType;
-        
-        Operator addOp = new Operator("+", ast.position);
-        addOp.decl = StdEnvironment.addDecl;
-        
-        Operator leOp = new Operator("<=", ast.position);
-        leOp.decl = StdEnvironment.notgreaterDecl;
-        
-        Operator andOp = new Operator("/\\", ast.position);
-        andOp.decl = StdEnvironment.andDecl;
-        
-        SimpleVname controlVarVname = new SimpleVname(new LongIdentifier(ast.IE.I,ast.position), ast.position);
-        VnameExpression controlVarVnameExpression = new VnameExpression(controlVarVname, ast.position);
-        controlVarVnameExpression.type = StdEnvironment.integerType;
-        BinaryExpression secondWhileCondition = new BinaryExpression(controlVarVnameExpression, leOp, ast.E1, ast.position);
-        secondWhileCondition.type = StdEnvironment.integerType;
-        BinaryExpression whileCondition = new BinaryExpression(secondWhileCondition, andOp, ast.W.E, ast.position);
-        whileCondition.type = StdEnvironment.integerType;
-        BinaryExpression controlVarInc = new BinaryExpression(controlVarVnameExpression, addOp, intE, ast.position);
-        controlVarInc.type = StdEnvironment.integerType;
-      
-        new WhileCommand(whileCondition, new SequentialCommand(ast.W.C, new AssignCommand(controlVarVname, controlVarInc, ast.position), ast.position),ast.position).visit(this, frame1);
+        Integer valSize = new Integer(Machine.integerSize);
 
+        //const e2 init
+        ConstDeclaration constDec = new ConstDeclaration(null, ast.E1, ast.position);
+        constDec.visit(this, frame1);
+
+        Frame frame2 = new Frame(frame, valSize);
+
+        //while
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        loopAddr = nextInstrAddr;
+        //start commands
+
+        ast.W.C.visit(this, frame2);
+        //assign command
+        //binary expression
+        //Vname Expression
+        ObjectAddress address = ((KnownAddress) ast.IE.I.decl.entity).address;
+        emit(Machine.LOADop, valSize, displayRegister(frame2.level, address.level), address.displacement);
+        //Integer expression
+        emit(Machine.LOADLop, 0, 0, 1);
+        //operator
+        int displacement = ((PrimitiveRoutine) StdEnvironment.addDecl.entity).displacement;
+        if (displacement != Machine.idDisplacement)
+            emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement);
+
+        //simple vname
+        emit(Machine.STOREop, valSize, displayRegister(new Frame(frame2,valSize.intValue()).level,address.level), address.displacement);
+
+        patch(jumpAddr, nextInstrAddr);
+        //end commands
+
+        //while expression condition
+        //binary expression
+
+        //binary expression
+        //Vname Expression
+        emit(Machine.LOADop, valSize, displayRegister(frame1.level, address.level), address.displacement);
+        //expression
+        Frame frame3 = new Frame(frame2, valSize);
+        if (constDec.entity instanceof KnownValue) {
+            // presumably offset = 0 and indexed = false
+            int value = ((KnownValue) constDec.entity).value;
+            emit(Machine.LOADLop, 0, 0, value);
+        }
+        else{
+            ObjectAddress constAddress = ((UnknownValue) constDec.entity).address;
+            emit(Machine.LOADop, valSize, displayRegister(frame3.level, constAddress.level), constAddress.displacement);
+        }
+
+        //operator
+        int displacement2 = ((PrimitiveRoutine) StdEnvironment.notgreaterDecl.entity).displacement;
+        if (displacement2 != Machine.idDisplacement)
+            emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement2);
+
+        //E3
+        Frame frame4 = new Frame(frame3,valSize);
+        ast.W.E.visit(this,frame4);
+
+        //operator
+        int displacement3 = ((PrimitiveRoutine) StdEnvironment.andDecl.entity).displacement;
+        if (displacement3 != Machine.idDisplacement)
+            emit(Machine.CALLop, Machine.SBr, Machine.PBr, displacement3);
+
+        //while condition end
+        emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
         return 0;
     }
 
@@ -1183,7 +1225,7 @@ public final class Encoder implements Visitor {
         Integer valSize = new Integer(Machine.integerSize);
         
         //const e2 init
-        ConstDeclaration constDec = new ConstDeclaration(new Identifier("xd", ast.position), ast.E1, ast.position);
+        ConstDeclaration constDec = new ConstDeclaration(null, ast.E1, ast.position);
         constDec.visit(this, frame1);
         
         Frame frame2 = new Frame(frame, valSize);
@@ -1219,8 +1261,6 @@ public final class Encoder implements Visitor {
         emit(Machine.LOADop, valSize, displayRegister(frame1.level, address.level), address.displacement);
         //expression
         Frame frame3 = new Frame(frame2, valSize);
-        
-        //ast.E1.visit(this, frame3);
         if (constDec.entity instanceof KnownValue) {
             // presumably offset = 0 and indexed = false
             int value = ((KnownValue) constDec.entity).value;
@@ -1230,7 +1270,6 @@ public final class Encoder implements Visitor {
             ObjectAddress constAddress = ((UnknownValue) constDec.entity).address;
             emit(Machine.LOADop, valSize, displayRegister(frame3.level, constAddress.level), constAddress.displacement);
         }
-        
         
         //operator
         int displacement2 = ((PrimitiveRoutine) StdEnvironment.notgreaterDecl.entity).displacement;
